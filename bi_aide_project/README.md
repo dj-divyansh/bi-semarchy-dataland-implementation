@@ -412,16 +412,12 @@ Implemented patterns:
 - `QUALIFY ROW_NUMBER()` to select the latest satellite record per hub key in marts
 - Explicit column selection in unions to avoid schema drift and compilation surprises
 
-## 10. Orchestration Guidance
-
-This repo is compatible with any scheduler that can run shell commands (Airflow, dbt Cloud, Azure DevOps, etc.).
 
 Recommended job order:
 1) `dbt seed`
 2) `dbt run -s stage`
 3) `dbt run -s raw_vault`
 4) `dbt run -s data_mart dq`
-5) `dbt test`
 
 ## 11. Lessons Learned / Best Practices
 
