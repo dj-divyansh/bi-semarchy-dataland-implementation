@@ -43,6 +43,7 @@ This project follows a strict layered approach:
      - Warn-and-proceed pattern (reject capture tables for missing mandatory fields)
 
 ### 2.2 Data Lineage (High-Level)
+<img width="6220" height="4180" alt="Mermaid Chart - Create complex, visual diagrams with text -2026-03-11-224647" src="https://github.com/user-attachments/assets/0e4b05e7-97df-4c78-b5f2-b6fe836e4d44" />
 
 
 This project is designed to write only into the single schema defined by the active dbt target in `profiles.yml`.
