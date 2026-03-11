@@ -1,0 +1,35 @@
+{{ config(materialized='table', tags=['mart']) }}
+
+WITH stg AS (
+    SELECT
+        GEOGRAPHIC_ID,
+        DATASET_ID,
+        MANUFACTURER,
+        CORPORATION
+    FROM {{ ref('stg_iqvia_midas') }}
+),
+
+final AS (
+    SELECT DISTINCT
+        GEOGRAPHIC_ID AS CNTRY,
+        DATASET_ID AS DATASOURCE,
+        MANUFACTURER AS MANU_CD,
+        MANUFACTURER AS MANU_SHRT,
+        MANUFACTURER AS MANU_DESC,
+        CORPORATION AS CORP_CD,
+        CORPORATION AS CORP_RES,
+        CORPORATION AS CORP_DESC
+    FROM stg
+    WHERE MANUFACTURER IS NOT NULL OR CORPORATION IS NOT NULL
+)
+
+SELECT
+    CNTRY,
+    DATASOURCE,
+    MANU_CD,
+    MANU_SHRT,
+    MANU_DESC,
+    CORP_CD,
+    CORP_RES,
+    CORP_DESC
+FROM final

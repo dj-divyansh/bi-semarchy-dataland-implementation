@@ -1,0 +1,11 @@
+version: 2
+
+sources:
+  - name: landing_iqvia
+    database: IQVIA_DAAS_BOEHRINGER_EU_PROD_DATASHARE
+    schema: DAAS_BOEHRINGER_PROD_EU_1_0_0
+    tables:
+      - name: MIDAS_BOEHRINGER_DASS_BI_MTH_STG
+      - name: MIDAS_BOEHRINGER_DASS_BI_QTR_STG
+      - name: MIDAS_BOEHRINGER_DASS_BI_MTH_HQ_STG
+      - name: MIDAS_BOEHRINGER_DASS_BI_QTR_HQ_STG

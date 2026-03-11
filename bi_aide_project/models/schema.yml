@@ -1,0 +1,209 @@
+version: 2
+
+seeds:
+  - name: dim_country
+    description: Reference country list used for ISO code lookups in staging.
+    columns:
+      - name: NAME
+        tests:
+          - not_null
+          - unique
+      - name: ISO2_CODE
+        tests:
+          - not_null
+          - unique
+      - name: ISO3_CODE
+        tests:
+          - not_null
+
+models:
+  - name: stg_iqvia_midas
+    description: >
+      Staging integration for IQVIA MIDAS. Unions HQ and non-HQ sources into a standardized rowset and
+      enriches with ISO2 country code from dim_country. Output grain is Product, with PRODUCT_TYPE_CODE
+      in (Brand, PMP).
+    columns:
+      - name: GEOGRAPHIC_ID
+        description: ISO2 country code derived from dim_country.
+        tests:
+          - not_null
+      - name: DATASET_ID
+        description: Constant identifier for the logical source system.
+        tests:
+          - not_null
+      - name: SOURCE_DATASET_ID
+        description: MIDAS source dataset identifier (DS_NM from the union branches).
+        tests:
+          - not_null
+      - name: PRODUCT_TYPE_CODE
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["Brand", "PMP"]
+      - name: PRODUCT_NAME
+        tests:
+          - not_null
+
+  - name: hub_product
+    description: >
+      Raw Vault Hub for products (both Brand and PMP). Business key contract is
+      (GEOGRAPHIC_ID, SOURCE_DATASET_ID, PRODUCT_NAME). HK_PRODUCT is an MD5 hash of this business key.
+    columns:
+      - name: HK_PRODUCT
+        tests:
+          - not_null
+          - unique
+      - name: BUSINESS_KEY
+        description: Natural business key string used to generate HK_PRODUCT.
+        tests:
+          - not_null
+      - name: LOAD_DATETIME
+        tests:
+          - not_null
+      - name: RECORD_SOURCE
+        tests:
+          - not_null
+
+  - name: sat_product_iqvia
+    description: >
+      Raw Vault Satellite for IQVIA MIDAS product descriptive attributes. Tracks changes over time using HASHDIFF
+      and captures LOAD_DATETIME and RECORD_SOURCE for lineage.
+    columns:
+      - name: HK_PRODUCT
+        tests:
+          - not_null
+      - name: HASHDIFF
+        tests:
+          - not_null
+      - name: LOAD_DATETIME
+        tests:
+          - not_null
+      - name: RECORD_SOURCE
+        tests:
+          - not_null
+
+  - name: link_product_brand
+    description: >
+      Raw Vault Link between PMP products and their parent Brand. Contract: HK_PMP must match the Hub key
+      for PMP records and HK_BRAND must match the Hub key for Brand records. HK_LINK uniquely identifies
+      the relationship.
+    columns:
+      - name: HK_LINK
+        tests:
+          - not_null
+          - unique
+      - name: HK_PMP
+        tests:
+          - not_null
+      - name: HK_BRAND
+        tests:
+          - not_null
+      - name: LOAD_DATETIME
+        tests:
+          - not_null
+      - name: RECORD_SOURCE
+        tests:
+          - not_null
+
+  - name: dm_standardized_product_file
+    description: Canonical flat product file for Semarchy consumption, built from the latest satellite record per product.
+    columns:
+      - name: DATASET_PRODUCT_ID
+        tests:
+          - not_null
+      - name: GEOGRAPHIC_ID
+        tests:
+          - not_null
+      - name: DATASET_ID
+        tests:
+          - not_null
+      - name: SOURCE_DATASET_ID
+        tests:
+          - not_null
+
+  - name: dm_standardized_product_relationship
+    description: Canonical product relationship file (Brand parent to PMP child) for Semarchy consumption.
+    columns:
+      - name: PARENT_DATASET_PRODUCT_ID
+        tests:
+          - not_null
+      - name: CHILD_DATASET_PRODUCT_ID
+        tests:
+          - not_null
+      - name: RELATIONSHIP_TYPE_CODE
+        tests:
+          - not_null
+
+  - name: dm_standardized_product_identifier
+    description: Canonical product identifier file for Semarchy consumption, one row per (product, identifier type).
+    columns:
+      - name: DATASET_PRODUCT_ID
+        tests:
+          - not_null
+      - name: IDENTIFIER_TYPE_CODE
+        tests:
+          - not_null
+      - name: IDENTIFIER_ID
+        tests:
+          - not_null
+      - name: STATUS_CODE
+        tests:
+          - not_null
+
+  - name: dm_standardized_product_additional_attributes
+    description: Canonical product additional attributes for Semarchy consumption.
+    columns:
+      - name: DATASET_ID
+        tests:
+          - not_null
+      - name: DATASET_PRODUCT_ID
+        tests:
+          - not_null
+      - name: PRODUCT_ADDITIONAL_INFO_TYPE
+        tests:
+          - not_null
+      - name: PRODUCT_ADDITIONAL_INFO_VALUE
+        tests:
+          - not_null
+      - name: COUNTRY_CODE
+        tests:
+          - not_null
+
+  - name: dm_standardized_atc
+    description: Canonical ATC reference/hierarchy extracted from IQVIA MIDAS staging.
+    columns:
+      - name: CNTRY_CD
+        tests:
+          - not_null
+      - name: SRC
+        tests:
+          - not_null
+      - name: ATC_4
+        tests:
+          - not_null
+
+  - name: dm_standardized_manufacturer
+    description: Canonical manufacturer and corporation reference extracted from IQVIA MIDAS staging.
+    columns:
+      - name: CNTRY
+        tests:
+          - not_null
+      - name: DATASOURCE
+        tests:
+          - not_null
+
+  - name: reject_iqvia_product
+    description: >
+      Data quality reject capture for IQVIA MIDAS. Warn-and-proceed pattern that stores rows with missing mandatory fields
+      for alerting and triage.
+    columns:
+      - name: ERROR_LEVEL
+        tests:
+          - not_null
+      - name: ERROR_MESSAGE
+        tests:
+          - not_null
+      - name: LOAD_DATETIME
+        tests:
+          - not_null

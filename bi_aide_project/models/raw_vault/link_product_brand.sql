@@ -1,0 +1,32 @@
+{{ config(materialized='incremental', unique_key='HK_LINK', tags=['vault']) }}
+
+WITH pmp_data AS (
+    -- Only look at PMP records because they contain both PMP and Brand context
+    SELECT 
+        -- 1. Generate the PMP Hash Key (Same logic as Satellite)
+        MD5(UPPER(CONCAT("GEOGRAPHIC_ID", '_', "SOURCE_DATASET_ID", '_', "PRODUCT_NAME"))) AS HK_PMP,
+        
+        -- 2. Reconstruct the Brand Hash Key (Using the Brand Name logic from Staging)
+        MD5(UPPER(CONCAT("GEOGRAPHIC_ID", '_', "SOURCE_DATASET_ID", '_', "GEOGRAPHIC_ID", ' ', "SOURCE_DATASET_ID", ' ', "BRAND_NAME"))) AS HK_BRAND,
+        
+        "GEOGRAPHIC_ID",
+        CURRENT_TIMESTAMP() AS LOAD_DATETIME,
+        'IQVIA_MIDAS' AS RECORD_SOURCE
+    FROM {{ ref('stg_iqvia_midas') }}
+    WHERE "PRODUCT_TYPE_CODE" = 'PMP'
+)
+
+SELECT DISTINCT
+    -- 3. The Link Hash Key is an MD5 of the two connected Hub Keys
+    MD5(CONCAT(HK_PMP, HK_BRAND)) AS HK_LINK,
+    HK_BRAND,
+    HK_PMP,
+    "GEOGRAPHIC_ID",
+    LOAD_DATETIME,
+    RECORD_SOURCE
+FROM pmp_data
+
+{% if is_incremental() %}
+    -- Only insert new relationships we haven't seen before
+    WHERE MD5(CONCAT(HK_PMP, HK_BRAND)) NOT IN (SELECT HK_LINK FROM {{ this }})
+{% endif %}

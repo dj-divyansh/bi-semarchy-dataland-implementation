@@ -1,0 +1,57 @@
+# name: 'bi_aide_project'
+# version: '1.0.0'
+# profile: 'bi_aide_project'
+
+# model-paths: ["models"]
+# # ... (keep other paths)
+
+# models:
+#   bi_aide_project:
+#     # Default materialization is view, we will override
+#     # in subdirectories for the new Data Vault architecture.
+#     +database: BI_AIDE_SANDBOX_DB
+    
+#     stage:
+#       +schema: STAGE_DFHPMS2EU_SCHEMA
+#       +materialized: table
+    
+#     raw_vault:
+#       +schema: DW_DFHPMS2EU_SCHEMA
+#       +materialized: incremental
+    
+#     data_marts:
+#       +schema: DM_DFHPMS2EU_SCHEMA
+#       +materialized: table
+
+name: 'bi_aide_project'
+version: '1.0.0'
+profile: 'bi_aide_project'
+
+seeds:
+  bi_aide_project:
+    dim_country:
+      +column_types: 
+        CONTINENT: varchar(16777216)
+        NAME: varchar(16777216)
+        ISO2_CODE: varchar(16777216)
+        ISO3_CODE: varchar(16777216)
+        
+
+models:
+  bi_aide_project:
+    +database: DEV_DFHPMS2EU_DB
+    
+    # REMOVE THE +schema: LINES here. 
+    # Let the profile handle the schema target.
+    
+    stage:
+      +materialized: table
+    
+    raw_vault:
+      +materialized: incremental
+      
+    data_mart:
+      +materialized: table
+      
+    dq:
+      +materialized: incremental
