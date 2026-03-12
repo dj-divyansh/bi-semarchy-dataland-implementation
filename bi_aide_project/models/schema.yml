@@ -47,15 +47,15 @@ models:
 
   - name: hub_product
     description: >
-      Raw Vault Hub for products (both Brand and PMP). Business key contract is
-      (GEOGRAPHIC_ID, SOURCE_DATASET_ID, PRODUCT_NAME). HK_PRODUCT is an MD5 hash of this business key.
+      Raw Vault Hub for products (both Brand and PMP). Key contract aligns to staging BUSINESS_KEY so the same
+      dataset_product_id can be used consistently across canonical outputs. HK_PRODUCT equals BUSINESS_KEY.
     columns:
       - name: HK_PRODUCT
         tests:
           - not_null
           - unique
       - name: BUSINESS_KEY
-        description: Natural business key string used to generate HK_PRODUCT.
+        description: Deterministic source key from staging used as the hub business key (and as HK_PRODUCT).
         tests:
           - not_null
       - name: LOAD_DATETIME
@@ -198,6 +198,10 @@ models:
       Data quality reject capture for IQVIA MIDAS. Warn-and-proceed pattern that stores rows with missing mandatory fields
       for alerting and triage.
     columns:
+      - name: REJECT_KEY
+        tests:
+          - not_null
+          - unique
       - name: ERROR_LEVEL
         tests:
           - not_null

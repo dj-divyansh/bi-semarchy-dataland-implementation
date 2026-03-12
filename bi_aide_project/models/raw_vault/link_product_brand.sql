@@ -3,17 +3,17 @@
 WITH pmp_data AS (
     -- Only look at PMP records because they contain both PMP and Brand context
     SELECT 
-        -- 1. Generate the PMP Hash Key (Same logic as Satellite)
-        MD5(UPPER(CONCAT("GEOGRAPHIC_ID", '_', "SOURCE_DATASET_ID", '_', "PRODUCT_NAME"))) AS HK_PMP,
-        
-        -- 2. Reconstruct the Brand Hash Key (Using the Brand Name logic from Staging)
-        MD5(UPPER(CONCAT("GEOGRAPHIC_ID", '_', "SOURCE_DATASET_ID", '_', "GEOGRAPHIC_ID", ' ', "SOURCE_DATASET_ID", ' ', "BRAND_NAME"))) AS HK_BRAND,
-        
-        "GEOGRAPHIC_ID",
+        -- 1. PMP key uses the staging BUSINESS_KEY contract
+        BUSINESS_KEY AS HK_PMP,
+
+        -- 2. Brand key is the deterministic hash used by Brand rows in staging
+        MD5(CONCAT(GEOGRAPHIC_ID, SOURCE_DATASET_ID, SOURCE_PRODUCT_BRAND_ID)) AS HK_BRAND,
+
+        GEOGRAPHIC_ID,
         CURRENT_TIMESTAMP() AS LOAD_DATETIME,
         'IQVIA_MIDAS' AS RECORD_SOURCE
     FROM {{ ref('stg_iqvia_midas') }}
-    WHERE "PRODUCT_TYPE_CODE" = 'PMP'
+    WHERE PRODUCT_TYPE_CODE = 'PMP'
 )
 
 SELECT DISTINCT
@@ -21,7 +21,7 @@ SELECT DISTINCT
     MD5(CONCAT(HK_PMP, HK_BRAND)) AS HK_LINK,
     HK_BRAND,
     HK_PMP,
-    "GEOGRAPHIC_ID",
+    GEOGRAPHIC_ID,
     LOAD_DATETIME,
     RECORD_SOURCE
 FROM pmp_data

@@ -46,12 +46,14 @@ This project follows a strict layered approach:
 <img width="6220" height="4180" alt="Mermaid Chart - Create complex, visual diagrams with text -2026-03-11-224647" src="https://github.com/user-attachments/assets/0e4b05e7-97df-4c78-b5f2-b6fe836e4d44" />
 
 
+### 2.3 Snowflake + dbt Constraints (Critical)
+
 This project is designed to write only into the single schema defined by the active dbt target in `profiles.yml`.
 
 - Do **not** set `+schema:` in `dbt_project.yml`
 - Do **not** set `schema=` in individual models unless you explicitly intend to override (this project avoids overrides)
 
-### 3.2 Identifier Casing Rules (Snowflake)
+### 2.4 Identifier Casing Rules (Snowflake)
 
 Snowflake treats unquoted identifiers as uppercase. If a table was created with uppercase column names (dbt default), then downstream references must be:
 
@@ -60,7 +62,7 @@ Snowflake treats unquoted identifiers as uppercase. If a table was created with 
 
 Avoid unquoted lowercase references (e.g., `geographic_id`) in downstream transformations; they can produce `invalid identifier` errors at runtime.
 
-### 3.3 Union Integrity Rules
+### 2.5 Union Integrity Rules
 
 When writing `UNION ALL` statements:
 - Never use `SELECT *`
@@ -97,24 +99,21 @@ We use hash keys because:
 - Hash keys let us integrate multiple sources using consistent keying patterns.
 - Hash keys are deterministic: the same BK always produces the same HK (when you apply consistent formatting rules).
 
-**How we build a correct HK (project standard)**
-- Uppercase everything to avoid case differences creating different hashes.
-- Use a delimiter (`'||'`) so values don’t “run together” (to avoid accidental collisions).
-- Use `COALESCE(col, '')` so nulls don’t cause inconsistent hashes.
+**Key contract used in this project**
 
-Example pattern:
+To keep all Semarchy-facing files joinable, this project uses the staging `BUSINESS_KEY` as the vault product key:
+- `HK_PRODUCT = BUSINESS_KEY`
+- Canonical `dataset_product_id` is derived from the same key:
+  - Brand: `BRAND_` + `BUSINESS_KEY`
+  - PMP: `BUSINESS_KEY`
 
-```sql
-MD5(
-  UPPER(
-    CONCAT_WS('||',
-      COALESCE(GEOGRAPHIC_ID, ''),
-      COALESCE(SOURCE_DATASET_ID, ''),
-      COALESCE(PRODUCT_NAME, '')
-    )
-  )
-)
-```
+How `BUSINESS_KEY` is generated in staging (STTM-aligned):
+- Brand: `MD5(CONCAT(GEOGRAPHIC_ID, SOURCE_DATASET_ID, SOURCE_PRODUCT_BRAND_ID))`
+- PMP: `MD5(CONCAT(GEOGRAPHIC_ID, SOURCE_DATASET_ID, SOURCE_PRODUCT_BRAND_ID, SOURCE_PRODUCT_PACK_ID))`
+
+Important STTM note (COUNTRY vs ISO2):
+- Some STTMs describe the hash inputs using `COUNTRY`.
+- This project normalizes `COUNTRY` to ISO2 (`GEOGRAPHIC_ID`) via `dim_country` before hashing so keys are stable and standardized across spelling/format variations.
 
 ### 3.3 Why We Generate HASHDIFF in Satellites
 
@@ -271,6 +270,15 @@ dbt run -s stg_iqvia_midas --full-refresh
 This avoids runtime errors like:
 - `SQL compilation error: invalid identifier '<COLUMN_NAME>'`
 
+If you change key contracts (BUSINESS_KEY / HKs) or satellite change logic:
+- Full refresh staging + vault + marts to avoid mixed-key history:
+
+```bash
+dbt run -s stg_iqvia_midas --full-refresh
+dbt run -s hub_product link_product_brand sat_product_iqvia --full-refresh
+dbt run -s data_mart dq --full-refresh
+```
+
 ## 7. Implementation Details (Model-by-Model)
 
 ### 7.1 Sources (`models/sources.yml`)
@@ -291,6 +299,8 @@ Key behaviors:
 - Unions four MIDAS extracts into a single standardized shape
 - ISO country enrichment via `dim_country`
 - Derives `PRESCRIPTION_REQUIRED_INDICATOR`
+- Standardizes ATC columns across HQ vs non-HQ using COALESCE between `ATC*` and `INTWHOATC*`
+- Derives `WHO_CODE` from `INTWHOATC5` (first 7 characters)
 - Produces canonical staging columns used throughout vault + marts
 
 Why it looks like this:
@@ -299,7 +309,14 @@ Why it looks like this:
 
 Output columns include:
 - Identifiers: `BUSINESS_KEY`, `GEOGRAPHIC_ID`, `DATASET_ID`, `SOURCE_DATASET_ID`, `PRODUCT_TYPE_CODE`, `PRODUCT_NAME`
-- Product attributes: `BRAND_NAME`, `SUBSTANCE`, ATC breakdown (`ATC1..ATC4`), `ATC_CODE`, `MANUFACTURER`, `CORPORATION`, etc.
+- Source identifiers: `SOURCE_PRODUCT_BRAND_ID`, `SOURCE_PRODUCT_PACK_ID`
+- Classification attributes: ATC breakdown (`ATC1..ATC4`), `ATC_CODE`, `ATC4_DESCR`, `WHO_CODE`, `NFC_CODE`
+- Manufacturer/corporation: `MANUFACTURER_CODE` (HQ only), `MANUFACTURER` (HQ only), `CORPORATION`
+
+Source column availability (HQ vs non-HQ):
+- Some attributes exist only in HQ extracts (e.g., `INTWHOATC*`, `INTWHOATC5`, `MNF`/manufacturer code).
+- Some attributes exist only in non-HQ extracts (e.g., `ATC4_DESCR`).
+- Staging uses explicit `NULL AS ...` in the missing branches so downstream models always see a consistent column set.
 
 ### 7.4 Raw Vault: `hub_product`
 
@@ -307,7 +324,7 @@ Purpose:
 - Store product business keys and a stable hash key `HK_PRODUCT`.
 
 Business Key Contract:
-- `GEOGRAPHIC_ID + SOURCE_DATASET_ID + PRODUCT_NAME`
+- `HK_PRODUCT = BUSINESS_KEY` from staging
 
 Why the hub is incremental:
 - Once a hub key exists, it should never change. Incremental loads avoid reprocessing all historical keys each run.
@@ -319,7 +336,7 @@ Purpose:
 
 Current behavior:
 - Generates `HK_PRODUCT` and `HASHDIFF`
-- Loads incrementally based on load timestamp logic
+- Loads incrementally by inserting only new `(HK_PRODUCT, HASHDIFF)` combinations
 
 Note:
 - The project standard for hashing is:
@@ -334,6 +351,8 @@ Why satellites exist separately from hubs:
 
 Purpose:
 - Capture relationships between PMP products and their parent Brand.
+  - `HK_PMP` uses the PMP `BUSINESS_KEY` contract
+  - `HK_BRAND` uses the Brand `BUSINESS_KEY` contract
 
 Why links exist:
 - Relationships change independently of attributes.
@@ -341,9 +360,18 @@ Why links exist:
 
 ### 7.7 Data Mart: Canonical Outputs
 
+STTM mapping (what each canonical model produces):
+- `dm_standardized_product_file` → `product_file.csv`
+- `dm_standardized_product_identifier` → `product_identifier.csv`
+- `dm_standardized_product_relationship` → `product_relationship.csv`
+- `dm_standardized_product_additional_attributes` → `Additional_Attributes.csv`
+- `dm_standardized_atc` → `ATC.csv`
+- `dm_standardized_manufacturer` → `Manufacturer.csv`
+
 #### dm_standardized_product_file
 - Canonical product flat table for Semarchy
 - Joins `hub_product` to latest `sat_product_iqvia` (latest record per `HK_PRODUCT`)
+  - Includes `who_code` and `nfc_code` derived from staging
 
 Why we pick “latest satellite record”:
 - Semarchy canonical extracts generally need the current view of a product.
@@ -352,6 +380,7 @@ Why we pick “latest satellite record”:
 #### dm_standardized_product_relationship
 - Canonical relationship table: Brand (parent) → PMP (child)
 - Sourced from `link_product_brand`
+  - Outputs `parent_geographic_id` and `child_geographic_id` per STTM
 
 #### dm_standardized_product_identifier
 - Canonical identifier table derived from staging
@@ -364,18 +393,22 @@ Why identifier tables are derived from staging:
 #### dm_standardized_product_additional_attributes
 - Canonical “additional attributes” output (e.g., `CHC_PRODUCT_FLAG`)
 - Currently derives `CHC_PRODUCT_FLAG` from `SEMI_ETHICAL`
+  - Uses `SOURCE_DATASET_ID` as the file-level `dataset_id` to match STTM expectations for dataset naming
 
 #### dm_standardized_atc
 - Canonical ATC hierarchy/reference extracted from staging (`ATC1..ATC4`)
+  - Uses `ATC4_DESCR` for `atc4_value` when available
 
 #### dm_standardized_manufacturer
 - Canonical manufacturer/corporation reference extracted from staging
+  - Uses `MANUFACTURER_CODE` for `manu_cd` when available (HQ sources)
 
 ### 7.8 Data Quality: `reject_iqvia_product`
 
 Warn-and-proceed DQ capture:
 - Identifies missing mandatory fields (e.g., `GEOGRAPHIC_ID`, `SOURCE_DATASET_ID`, `PRODUCT_NAME`)
 - Writes failing rows to a reject table for alerting and downstream triage
+- Deduplicates rejects using a deterministic `REJECT_KEY` so incrementals do not re-insert the same issue every run
 
 ## 8. Tests, Quality Gates, and Troubleshooting
 
@@ -418,6 +451,7 @@ Recommended job order:
 2) `dbt run -s stage`
 3) `dbt run -s raw_vault`
 4) `dbt run -s data_mart dq`
+5) `dbt test`
 
 ## 11. Lessons Learned / Best Practices
 
@@ -427,3 +461,8 @@ Recommended job order:
 - Maintain a clear business key contract per hub and ensure link keys align with hub key definitions.
 - Keep seed reference data clean (whitespace and formatting issues can silently break lookups).
 - When in doubt, make “why” explicit in the mart layer: marts are where business-facing semantics should be readable and stable.
+
+## 12. Lineage Diagram Notes
+
+The high-level lineage diagram is embedded near the top of this README. A copy of the diagram also exists in the repo root:
+- `Mermaid Chart - Create complex, visual diagrams with text.-2026-03-11-224647.png`

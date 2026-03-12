@@ -7,7 +7,8 @@ WITH stg AS (
         ATC1,
         ATC2,
         ATC3,
-        ATC4
+        ATC4,
+        ATC4_DESCR
     FROM {{ ref('stg_iqvia_midas') }}
     WHERE ATC4 IS NOT NULL
 ),
@@ -25,7 +26,7 @@ final AS (
         ATC3 AS PRNT_CD,
         '3' AS PRNT_LVL,
         'ATC' AS TYP,
-        ATC4 AS ATC4_VALUE
+        COALESCE(ATC4_DESCR, ATC4) AS ATC4_VALUE
     FROM stg
 )
 
