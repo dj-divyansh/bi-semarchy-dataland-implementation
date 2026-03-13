@@ -29,6 +29,7 @@ final AS (
         NULL::DATE AS EFFECTIVE_DATE,
         NULL::DATE AS END_DATE
     FROM stg
+    WHERE PRODUCT_TYPE_CODE = 'PMP'
 )
 
 SELECT

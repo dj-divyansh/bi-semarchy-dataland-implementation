@@ -19,7 +19,7 @@ brands AS (
         
         CONCAT('BRAND_', BUSINESS_KEY) AS dataset_product_id,
         SOURCE_DATASET_ID AS identifier_type_code,
-        CONCAT(GEOGRAPHIC_ID, '_', SOURCE_DATASET_ID, '_', SOURCE_PRODUCT_BRAND_ID) AS identifier_id,
+        MD5(CONCAT(GEOGRAPHIC_ID, '_', SOURCE_DATASET_ID, '_', SOURCE_PRODUCT_BRAND_ID)) AS identifier_id,
         
         'A' AS status_code,
         NULL::DATE AS effective_date,
@@ -36,7 +36,7 @@ pmps AS (
         BUSINESS_KEY AS dataset_product_id,
         
         SOURCE_DATASET_ID AS identifier_type_code,
-        CONCAT(GEOGRAPHIC_ID, '_', SOURCE_DATASET_ID, '_', SOURCE_PRODUCT_BRAND_ID, '_', SOURCE_PRODUCT_PACK_ID) AS identifier_id,
+        MD5(CONCAT(GEOGRAPHIC_ID, '_', SOURCE_DATASET_ID, '_', SOURCE_PRODUCT_BRAND_ID, '_', SOURCE_PRODUCT_PACK_ID)) AS identifier_id,
         
         'A' AS status_code,
         NULL::DATE AS effective_date,
