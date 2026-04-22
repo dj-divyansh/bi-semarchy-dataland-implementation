@@ -1,0 +1,12 @@
+
+
+WITH last_load_snapshot AS (
+    SELECT
+        CURRENT_TIMESTAMP() AS CAPTURED_AT,
+        s.*
+    FROM DEV_DFHPMS2EU_DB.DW_DFHPMS2EU_SEMARCHY_SCHEMA.SAT_PRODUCT_FILE s
+)
+
+SELECT s.*
+FROM last_load_snapshot s
+

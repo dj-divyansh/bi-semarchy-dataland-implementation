@@ -1,0 +1,49 @@
+name: 'veeva_crm'
+version: '1.0.0'
+profile: 'bi_aide_project'
+
+macro-paths: ["macro", "macros"]
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+  - "logs"
+
+on-run-start:
+  - "{{ log_run_start() }}"
+
+on-run-end:
+  - "{{ log_run_end(results) }}"
+
+flags:
+  fail_fast: true
+
+vars:
+  veeva_crm_source_database: DEV_DFHPMS2EU_DB
+  veeva_crm_source_schema: LANDING_DFHPMS2EU_SCHEMA
+
+models:
+  veeva_crm:
+    +database: DEV_DFHPMS2EU_DB
+
+    +pre-hook: "{{ log_model_start() }}"
+    
+    # We pass 'SUCCESS' if it reaches the post-hook without crashing.
+    # (Handling 'FAILED' states usually requires the orchestrator or dbt's on-run-end hook, 
+    # but for model-level success tracking, this is perfect).
+    +post-hook: "{{ log_model_end('SUCCESS') }}"
+
+    dq:
+      +materialized: incremental
+
+    stg:
+      +materialized: view
+
+    hub:
+      +materialized: incremental
+
+    sat:
+      +materialized: incremental
+
+    hist:
+      +materialized: incremental

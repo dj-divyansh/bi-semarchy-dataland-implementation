@@ -1,0 +1,273 @@
+version: 2
+ 
+sources:
+
+  - name: veeva_crm
+
+    database: "{{ var('veeva_crm_source_database', target.database) }}"
+
+    schema: "{{ var('veeva_crm_source_schema', 'LANDING_DFHPMS2EU_SCHEMA') }}"
+
+    tables:
+
+      - name: VEEVA_CRM_APCNBRCEM_PRODUCT_VOD__C
+
+        description: Veeva CRM Product data for APCNBRCEM region
+
+        columns:
+
+          - name: country_code_bi__c
+
+          - name: id
+
+          - name: name
+
+          - name: description_vod__c
+
+          - name: external_id_vod__c
+
+          - name: product_type_vod__c
+
+          - name: active_bi__c
+
+          - name: therapeutic_area_vod__c
+
+          - name: mdm_product_type_bi__c
+
+          - name: isdeleted
+
+          - name: parent_product_vod__c
+ 
+      - name: VEEVA_CRM_JPOPP8US_PRODUCT_VOD__C
+
+        description: Veeva CRM Product data for JPOPP8US region
+
+        columns:
+
+          - name: country_code_bi__c
+
+          - name: id
+
+          - name: name
+
+          - name: description_vod__c
+
+          - name: external_id_vod__c
+
+          - name: product_type_vod__c
+
+          - name: active_bi__c
+
+          - name: therapeutic_area_vod__c
+
+          - name: mdm_product_type_bi__c
+
+          - name: isdeleted
+
+          - name: parent_product_vod__c
+ 
+      - name: VEEVA_CRM_ITAWRI_PRODUCT_VOD__C
+
+        description: Veeva CRM Product data for ITAWRI region
+
+        columns:
+
+          - name: country_code_bi__c
+
+          - name: id
+
+          - name: name
+
+          - name: description_vod__c
+
+          - name: external_id_vod__c
+
+          - name: product_type_vod__c
+
+          - name: active_bi__c
+
+          - name: therapeutic_area_vod__c
+
+          - name: mdm_product_type_bi__c
+
+          - name: isdeleted
+
+          - name: parent_product_vod__c
+ 
+      - name: VEEVA_CRM_LATAM_PRODUCT_VOD__C
+
+        description: Veeva CRM Product data for LATAM region
+
+        columns:
+
+          - name: country_code_bi__c
+
+          - name: id
+
+          - name: name
+
+          - name: description_vod__c
+
+          - name: external_id_vod__c
+
+          - name: product_type_vod__c
+
+          - name: active_bi__c
+
+          - name: therapeutic_area_vod__c
+
+          - name: mdm_product_type_bi__c
+
+          - name: isdeleted
+
+          - name: parent_product_vod__c
+ 
+  - name: veeva_crm_reference
+
+    database: DEV_DFHPMS2EU_DB
+
+    schema: DW_DFHPMS2EU_SEMARCHY_SCHEMA
+
+    tables:
+
+      - name: VEEVA_FULL_TRANSFORMED_ALL_CORRECTED2_WITH_MD5
+
+        description: Reference table with existing product records and MD5 hashes
+
+        columns:
+
+          - name: hashdiff
+
+      - name: DIM_COUNTRY
+
+        columns:
+
+          - name: ISO2_CODE
+
+  - name: closeup_market
+
+    database: DEV_DFHPMS2EU_DB
+
+    schema: CLEAN_DFHPMS2EU_SCHEMA
+
+    tables:
+
+      - name: MARCAS
+
+        columns:
+
+          - name: COUNTRY
+
+          - name: CODIGO
+
+          - name: NOME
+
+          - name: SIGLALAB
+
+          - name: CURR_FLG
+
+          - name: LAST_UPDT_DT
+
+      - name: PRODUCTO
+
+        columns:
+
+          - name: COUNTRY
+
+          - name: CODIGO
+
+          - name: NOME
+
+          - name: MARCA
+
+          - name: FLG_CLASSIFIC
+
+          - name: FLG_ETICO
+
+          - name: CODIGOLAB
+
+          - name: CURR_FLG
+
+          - name: LAST_UPDT_DT
+
+      - name: CORPORACAO
+
+        columns:
+
+          - name: COUNTRY
+
+          - name: CODIGO
+
+          - name: NOME
+
+          - name: SIGLA
+
+          - name: CURR_FLG
+
+          - name: LAST_UPDT_DT
+
+      - name: LABORATORIO
+
+        columns:
+
+          - name: COUNTRY
+
+          - name: CODIGO
+
+          - name: CDG
+
+          - name: CDGCORPORACAO
+
+          - name: CURR_FLG
+
+          - name: LAST_UPDT_DT
+
+      - name: MOLECULA_PRODUCTO
+
+        columns:
+
+          - name: COUNTRY
+
+          - name: CDGPROD
+
+          - name: CDGMOL
+
+          - name: CURR_FLG
+
+          - name: LAST_UPDT_DT
+
+      - name: MOLECULA
+
+        columns:
+
+          - name: COUNTRY
+
+          - name: CODIGOMOLE
+
+          - name: NOME
+
+          - name: CURR_FLG
+
+          - name: LAST_UPDT_DT
+
+  - name: gob360_pm
+
+    database: DEV_DFHPMS2EU_DB
+
+    schema: LANDING_DFHPMS2EU_SCHEMA
+
+    tables:
+
+      - name: GOB360_MX_BOEHRINGER_CAT_CLAVES
+
+        columns:
+
+          - name: CLAVE
+
+          - name: NOMBRE
+
+          - name: FORMA_FARMA
+
+          - name: CONCENTRACION
+
+ 
