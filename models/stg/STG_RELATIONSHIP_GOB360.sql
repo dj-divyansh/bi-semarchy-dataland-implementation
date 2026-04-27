@@ -23,7 +23,6 @@ transformed as (
         null as end_date,
         current_timestamp() as source_lastmodifieddate
     from src
-    where 1 = 0
 ),
 
 final as (

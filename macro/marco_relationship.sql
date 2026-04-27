@@ -42,6 +42,7 @@
     source_system=None,
     audit_model_name=None,
     enable_watermark_filter=true,
+    require_parent_product_id=true,
     watermark_column='SOURCE_LASTMODIFIEDDATE',
     watermark_lookback_minutes=5
 ) %}
@@ -172,7 +173,9 @@
                 ON upper(trim(stg.child_dataset_product_id)) = cr.DATASET_PRODUCT_ID
             WHERE stg.PARENT_GEOGRAPHIC_ID IS NOT NULL AND TRIM(stg.PARENT_GEOGRAPHIC_ID) != ''
               AND stg.CHILD_GEOGRAPHIC_ID IS NOT NULL AND TRIM(stg.CHILD_GEOGRAPHIC_ID) != ''
+              {% if require_parent_product_id %}
               AND stg.PARENT_DATASET_PRODUCT_ID IS NOT NULL AND TRIM(stg.PARENT_DATASET_PRODUCT_ID) != ''
+              {% endif %}
               AND stg.CHILD_DATASET_PRODUCT_ID IS NOT NULL AND TRIM(stg.CHILD_DATASET_PRODUCT_ID) != ''
               {% if enable_watermark_filter %}
               AND stg.{{ watermark_column }} >= (

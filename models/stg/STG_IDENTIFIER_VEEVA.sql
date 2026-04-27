@@ -16,8 +16,12 @@ with apcnbrcem as (
         p.name as parent_name,
         c.lastmodifieddate
     from {{ source('veeva_crm', 'VEEVA_CRM_APCNBRCEM_PRODUCT_VOD__C') }} c
-    left outer join {{ source('veeva_crm', 'VEEVA_CRM_APCNBRCEM_PRODUCT_VOD__C') }} p
-        on c.parent_product_vod__c = p.id
+    left outer join (
+        select id, name,
+            row_number() over (partition by id order by lastmodifieddate desc) as rn
+        from {{ source('veeva_crm', 'VEEVA_CRM_APCNBRCEM_PRODUCT_VOD__C') }}
+    ) p
+        on c.parent_product_vod__c = p.id and p.rn = 1
 ),
 
 jpopp8us as (
@@ -36,8 +40,12 @@ jpopp8us as (
         p.name as parent_name,
         c.lastmodifieddate
     from {{ source('veeva_crm', 'VEEVA_CRM_JPOPP8US_PRODUCT_VOD__C') }} c
-    left outer join {{ source('veeva_crm', 'VEEVA_CRM_JPOPP8US_PRODUCT_VOD__C') }} p
-        on c.parent_product_vod__c = p.id
+    left outer join (
+        select id, name,
+            row_number() over (partition by id order by lastmodifieddate desc) as rn
+        from {{ source('veeva_crm', 'VEEVA_CRM_JPOPP8US_PRODUCT_VOD__C') }}
+    ) p
+        on c.parent_product_vod__c = p.id and p.rn = 1
 ),
 
 itawri as (
@@ -56,8 +64,12 @@ itawri as (
         p.name as parent_name,
         c.lastmodifieddate
     from {{ source('veeva_crm', 'VEEVA_CRM_ITAWRI_PRODUCT_VOD__C') }} c
-    left outer join {{ source('veeva_crm', 'VEEVA_CRM_ITAWRI_PRODUCT_VOD__C') }} p
-        on c.parent_product_vod__c = p.id
+    left outer join (
+        select id, name,
+            row_number() over (partition by id order by lastmodifieddate desc) as rn
+        from {{ source('veeva_crm', 'VEEVA_CRM_ITAWRI_PRODUCT_VOD__C') }}
+    ) p
+        on c.parent_product_vod__c = p.id and p.rn = 1
 ),
 
 latam as (
@@ -76,8 +88,12 @@ latam as (
         p.name as parent_name,
         c.lastmodifieddate
     from {{ source('veeva_crm', 'VEEVA_CRM_LATAM_PRODUCT_VOD__C') }} c
-    left outer join {{ source('veeva_crm', 'VEEVA_CRM_LATAM_PRODUCT_VOD__C') }} p
-        on c.parent_product_vod__c = p.id
+    left outer join (
+        select id, name,
+            row_number() over (partition by id order by lastmodifieddate desc) as rn
+        from {{ source('veeva_crm', 'VEEVA_CRM_LATAM_PRODUCT_VOD__C') }}
+    ) p
+        on c.parent_product_vod__c = p.id and p.rn = 1
 ),
 
 source_union as (
@@ -98,6 +114,16 @@ brand_filtered as (
       and (
           upper(mdm_product_type_bi__c) in ('LOCAL BRAND', 'GLOBAL BRAND')
           or external_id_vod__c like 'B\_%' escape '\\'
+      )
+      and upper(mdm_product_type_bi__c) not in ('MEDICAL SEGMENT', 'INDICATION')
+      and upper(name) not in (
+          'DERMATOLOGY',
+          'ENDOCRINOLOGY',
+          'GASTROENTEROLOGY',
+          'NEUROLOGY',
+          'OPTHALMOLOGY',
+          'RHEUMATOLOGY',
+          'UROLOGY'
       )
 ),
 
@@ -160,21 +186,46 @@ source as (
     select * from ta_filtered
 ),
 
+filtered_source as (
+    select *
+    from source
+    where (country_code_bi__c is not null and trim(country_code_bi__c) != '')
+      and (id is not null and trim(id) != '')
+      and (name is not null and trim(name) != '')
+      and upper(trim(name)) not like '%DUPLICATE TO%'
+      and upper(trim(name)) not like '<NOT SPECIFIED>'
+      and upper(trim(name)) not like '%DELETE%'
+      and upper(trim(name)) not like '%NOT SPECIFIED%'
+      and upper(trim(name)) not like 'BI %'
+      and upper(trim(country_code_bi__c)) in (
+          select upper(trim(iso2_code)) from {{ source('veeva_crm_reference', 'DIM_COUNTRY') }}
+      )
+),
+
 transformed as (
-    select
+    select distinct
         upper(trim(country_code_bi__c)) as geographic_id,
-        'VEEVA CRM' as dataset_id,
+        'VEEVA_CRM' as dataset_id,
         trim(id) as dataset_product_id,
-        'VEEVA CRM' as identifier_type_code,
-        concat(upper(trim(country_code_bi__c)), '_', 
+        'VEEVA_CRM' as identifier_type_code,
+        concat(upper(trim(country_code_bi__c)), '_',
         trim(id)) as identifier_id,
         null as status_code,
         null as effective_date,
         null as end_date,
         cast(lastmodifieddate as timestamp_ltz) as source_lastmodifieddate
-    from source
+    from filtered_source
 ),
- 
+
+deduped as (
+    select *,
+        row_number() over (
+            partition by geographic_id, dataset_product_id, identifier_id
+            order by source_lastmodifieddate desc
+        ) as rn
+    from transformed
+),
+
 final as (
     select
         geographic_id,
@@ -211,7 +262,8 @@ final as (
         current_timestamp() as load_datetime,
         '{{ env_var("ETL_BATCH_ID", env_var("DBT_JOB_RUN_ID", invocation_id)) }}' as etl_batch_id,
         'VEEVA_CRM' as record_source
-    from transformed
+    from deduped
+    where rn = 1
 )
- 
+
 select * from final

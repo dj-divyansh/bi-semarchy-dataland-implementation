@@ -17,8 +17,12 @@ with apcnbrcem as (
         c.lastmodifieddate as child_lastmodifieddate,
         p.lastmodifieddate as parent_lastmodifieddate
     from {{ source('veeva_crm', 'VEEVA_CRM_APCNBRCEM_PRODUCT_VOD__C') }} c
-    left outer join {{ source('veeva_crm', 'VEEVA_CRM_APCNBRCEM_PRODUCT_VOD__C') }} p
-        on c.parent_product_vod__c = p.id
+    left outer join (
+        select id, name, lastmodifieddate,
+            row_number() over (partition by id order by lastmodifieddate desc) as rn
+        from {{ source('veeva_crm', 'VEEVA_CRM_APCNBRCEM_PRODUCT_VOD__C') }}
+    ) p
+        on c.parent_product_vod__c = p.id and p.rn = 1
 ),
 
 jpopp8us as (
@@ -38,8 +42,12 @@ jpopp8us as (
         c.lastmodifieddate as child_lastmodifieddate,
         p.lastmodifieddate as parent_lastmodifieddate
     from {{ source('veeva_crm', 'VEEVA_CRM_JPOPP8US_PRODUCT_VOD__C') }} c
-    left outer join {{ source('veeva_crm', 'VEEVA_CRM_JPOPP8US_PRODUCT_VOD__C') }} p
-        on c.parent_product_vod__c = p.id
+    left outer join (
+        select id, name, lastmodifieddate,
+            row_number() over (partition by id order by lastmodifieddate desc) as rn
+        from {{ source('veeva_crm', 'VEEVA_CRM_JPOPP8US_PRODUCT_VOD__C') }}
+    ) p
+        on c.parent_product_vod__c = p.id and p.rn = 1
 ),
 
 itawri as (
@@ -59,8 +67,12 @@ itawri as (
         c.lastmodifieddate as child_lastmodifieddate,
         p.lastmodifieddate as parent_lastmodifieddate
     from {{ source('veeva_crm', 'VEEVA_CRM_ITAWRI_PRODUCT_VOD__C') }} c
-    left outer join {{ source('veeva_crm', 'VEEVA_CRM_ITAWRI_PRODUCT_VOD__C') }} p
-        on c.parent_product_vod__c = p.id
+    left outer join (
+        select id, name, lastmodifieddate,
+            row_number() over (partition by id order by lastmodifieddate desc) as rn
+        from {{ source('veeva_crm', 'VEEVA_CRM_ITAWRI_PRODUCT_VOD__C') }}
+    ) p
+        on c.parent_product_vod__c = p.id and p.rn = 1
 ),
 
 latam as (
@@ -80,8 +92,12 @@ latam as (
         c.lastmodifieddate as child_lastmodifieddate,
         p.lastmodifieddate as parent_lastmodifieddate
     from {{ source('veeva_crm', 'VEEVA_CRM_LATAM_PRODUCT_VOD__C') }} c
-    left outer join {{ source('veeva_crm', 'VEEVA_CRM_LATAM_PRODUCT_VOD__C') }} p
-        on c.parent_product_vod__c = p.id
+    left outer join (
+        select id, name, lastmodifieddate,
+            row_number() over (partition by id order by lastmodifieddate desc) as rn
+        from {{ source('veeva_crm', 'VEEVA_CRM_LATAM_PRODUCT_VOD__C') }}
+    ) p
+        on c.parent_product_vod__c = p.id and p.rn = 1
 ),
 
 source_union as (
@@ -164,114 +180,176 @@ source as (
     select * from ta_filtered
 ),
 
+filtered_source as (
+    select *
+    from source
+    where (country_code_bi__c is not null and trim(country_code_bi__c) != '')
+      and (id is not null and trim(id) != '')
+      and (name is not null and trim(name) != '')
+      and upper(trim(name)) not like '%DUPLICATE TO%'
+      and upper(trim(name)) not like '<NOT SPECIFIED>'
+      and upper(trim(name)) not like '%DELETE%'
+      and upper(trim(name)) not like '%NOT SPECIFIED%'
+      and upper(trim(name)) not like 'BI %'
+      and upper(trim(country_code_bi__c)) in (
+          select upper(trim(iso2_code)) from {{ source('veeva_crm_reference', 'DIM_COUNTRY') }}
+      )
+),
+
 global_brands as (
     select
-        upper(trim(country_code_bi__c)) as geographic_id,
-        id as dataset_product_id,
-        greatest(
-            coalesce(cast(child_lastmodifieddate as timestamp_ltz), '1900-01-01'::timestamp_ltz),
-            coalesce(cast(parent_lastmodifieddate as timestamp_ltz), '1900-01-01'::timestamp_ltz)
-        ) as source_lastmodifieddate
-    from source
-    where upper(mdm_product_type_bi__c) = 'GLOBAL BRAND'
+        geographic_id,
+        dataset_product_id,
+        max(source_lastmodifieddate) as source_lastmodifieddate
+    from (
+        select
+            upper(trim(country_code_bi__c)) as geographic_id,
+            id as dataset_product_id,
+            greatest(
+                coalesce(cast(child_lastmodifieddate as timestamp_ltz), '1900-01-01'::timestamp_ltz),
+                coalesce(cast(parent_lastmodifieddate as timestamp_ltz), '1900-01-01'::timestamp_ltz)
+            ) as source_lastmodifieddate
+        from filtered_source
+        where upper(mdm_product_type_bi__c) = 'GLOBAL BRAND'
+    )
+    group by geographic_id, dataset_product_id
 ),
 
 local_brands as (
     select
-        upper(trim(country_code_bi__c)) as geographic_id,
-        id as dataset_product_id,
-        parent_product_vod__c as parent_product_id,
-        greatest(
-            coalesce(cast(child_lastmodifieddate as timestamp_ltz), '1900-01-01'::timestamp_ltz),
-            coalesce(cast(parent_lastmodifieddate as timestamp_ltz), '1900-01-01'::timestamp_ltz)
-        ) as source_lastmodifieddate
-    from source
-    where upper(mdm_product_type_bi__c) = 'LOCAL BRAND'
+        geographic_id,
+        dataset_product_id,
+        parent_product_id,
+        max(source_lastmodifieddate) as source_lastmodifieddate
+    from (
+        select
+            upper(trim(country_code_bi__c)) as geographic_id,
+            id as dataset_product_id,
+            parent_product_vod__c as parent_product_id,
+            greatest(
+                coalesce(cast(child_lastmodifieddate as timestamp_ltz), '1900-01-01'::timestamp_ltz),
+                coalesce(cast(parent_lastmodifieddate as timestamp_ltz), '1900-01-01'::timestamp_ltz)
+            ) as source_lastmodifieddate
+        from filtered_source
+        where upper(mdm_product_type_bi__c) = 'LOCAL BRAND'
+    )
+    group by geographic_id, dataset_product_id, parent_product_id
 ),
 
 brands as (
     select
-        upper(trim(country_code_bi__c)) as geographic_id,
-        id as dataset_product_id,
-        parent_product_vod__c as parent_product_id,
-        greatest(
-            coalesce(cast(child_lastmodifieddate as timestamp_ltz), '1900-01-01'::timestamp_ltz),
-            coalesce(cast(parent_lastmodifieddate as timestamp_ltz), '1900-01-01'::timestamp_ltz)
-        ) as source_lastmodifieddate
-    from source
-    where upper(mdm_product_type_bi__c) in ('GLOBAL BRAND', 'LOCAL BRAND')
+        geographic_id,
+        dataset_product_id,
+        parent_product_id,
+        max(source_lastmodifieddate) as source_lastmodifieddate
+    from (
+        select
+            upper(trim(country_code_bi__c)) as geographic_id,
+            id as dataset_product_id,
+            parent_product_vod__c as parent_product_id,
+            greatest(
+                coalesce(cast(child_lastmodifieddate as timestamp_ltz), '1900-01-01'::timestamp_ltz),
+                coalesce(cast(parent_lastmodifieddate as timestamp_ltz), '1900-01-01'::timestamp_ltz)
+            ) as source_lastmodifieddate
+        from filtered_source
+        where upper(mdm_product_type_bi__c) in ('GLOBAL BRAND', 'LOCAL BRAND')
+    )
+    group by geographic_id, dataset_product_id, parent_product_id
 ),
 
 pmp_products as (
     select
-        upper(trim(country_code_bi__c)) as geographic_id,
-        id as dataset_product_id,
-        parent_product_vod__c as parent_product_id,
-        greatest(
-            coalesce(cast(child_lastmodifieddate as timestamp_ltz), '1900-01-01'::timestamp_ltz),
-            coalesce(cast(parent_lastmodifieddate as timestamp_ltz), '1900-01-01'::timestamp_ltz)
-        ) as source_lastmodifieddate
-    from source
-    where product_type_code = 'PMP'
+        geographic_id,
+        dataset_product_id,
+        parent_product_id,
+        max(source_lastmodifieddate) as source_lastmodifieddate
+    from (
+        select
+            upper(trim(country_code_bi__c)) as geographic_id,
+            id as dataset_product_id,
+            parent_product_vod__c as parent_product_id,
+            greatest(
+                coalesce(cast(child_lastmodifieddate as timestamp_ltz), '1900-01-01'::timestamp_ltz),
+                coalesce(cast(parent_lastmodifieddate as timestamp_ltz), '1900-01-01'::timestamp_ltz)
+            ) as source_lastmodifieddate
+        from filtered_source
+        where product_type_code = 'PMP'
+    )
+    group by geographic_id, dataset_product_id, parent_product_id
 ),
 
 ta_products as (
     select
-        upper(trim(country_code_bi__c)) as geographic_id,
-        id as dataset_product_id,
-        greatest(
-            coalesce(cast(child_lastmodifieddate as timestamp_ltz), '1900-01-01'::timestamp_ltz),
-            coalesce(cast(parent_lastmodifieddate as timestamp_ltz), '1900-01-01'::timestamp_ltz)
-        ) as source_lastmodifieddate
-    from source
-    where isdeleted = false
-      and (
-          upper(mdm_product_type_bi__c) = 'MEDICAL SEGMENT'
-          or upper(name) in (
-              'DERMATOLOGY',
-              'ENDOCRINOLOGY',
-              'GASTROENTEROLOGY',
-              'NEUROLOGY',
-              'OPTHALMOLOGY',
-              'RHEUMATOLOGY',
-              'UROLOGY'
+        geographic_id,
+        dataset_product_id,
+        max(source_lastmodifieddate) as source_lastmodifieddate
+    from (
+        select
+            upper(trim(country_code_bi__c)) as geographic_id,
+            id as dataset_product_id,
+            greatest(
+                coalesce(cast(child_lastmodifieddate as timestamp_ltz), '1900-01-01'::timestamp_ltz),
+                coalesce(cast(parent_lastmodifieddate as timestamp_ltz), '1900-01-01'::timestamp_ltz)
+            ) as source_lastmodifieddate
+        from filtered_source
+        where isdeleted = false
+          and (
+              upper(mdm_product_type_bi__c) = 'MEDICAL SEGMENT'
+              or upper(name) in (
+                  'DERMATOLOGY',
+                  'ENDOCRINOLOGY',
+                  'GASTROENTEROLOGY',
+                  'NEUROLOGY',
+                  'OPTHALMOLOGY',
+                  'RHEUMATOLOGY',
+                  'UROLOGY'
+              )
           )
-      )
+    )
+    group by geographic_id, dataset_product_id
 ),
 
 ind_products as (
     select
-        upper(trim(country_code_bi__c)) as geographic_id,
-        id as dataset_product_id,
-        parent_product_vod__c as parent_product_id,
-        greatest(
-            coalesce(cast(child_lastmodifieddate as timestamp_ltz), '1900-01-01'::timestamp_ltz),
-            coalesce(cast(parent_lastmodifieddate as timestamp_ltz), '1900-01-01'::timestamp_ltz)
-        ) as source_lastmodifieddate
-    from source
-    where isdeleted = false
-      and (
-          upper(mdm_product_type_bi__c) = 'INDICATION'
-          or (
-              upper(product_type_vod__c) = 'DETAIL'
-              and (mdm_product_type_bi__c = '' or mdm_product_type_bi__c is null)
-              and country_code_bi__c = 'GB'
-              and external_id_vod__c like 'GB\_%' escape '\\'
+        geographic_id,
+        dataset_product_id,
+        parent_product_id,
+        max(source_lastmodifieddate) as source_lastmodifieddate
+    from (
+        select
+            upper(trim(country_code_bi__c)) as geographic_id,
+            id as dataset_product_id,
+            parent_product_vod__c as parent_product_id,
+            greatest(
+                coalesce(cast(child_lastmodifieddate as timestamp_ltz), '1900-01-01'::timestamp_ltz),
+                coalesce(cast(parent_lastmodifieddate as timestamp_ltz), '1900-01-01'::timestamp_ltz)
+            ) as source_lastmodifieddate
+        from filtered_source
+        where isdeleted = false
+          and (
+              upper(mdm_product_type_bi__c) = 'INDICATION'
+              or (
+                  upper(product_type_vod__c) = 'DETAIL'
+                  and (mdm_product_type_bi__c = '' or mdm_product_type_bi__c is null)
+                  and country_code_bi__c = 'GB'
+                  and external_id_vod__c like 'GB\_%' escape '\\'
+              )
+              or (
+                  (upper(product_type_vod__c) = '' or product_type_vod__c is null)
+                  and (mdm_product_type_bi__c = '' or mdm_product_type_bi__c is null)
+                  and external_id_vod__c like '10_%'
+              )
           )
-          or (
-              (upper(product_type_vod__c) = '' or product_type_vod__c is null)
-              and (mdm_product_type_bi__c = '' or mdm_product_type_bi__c is null)
-              and external_id_vod__c like '10_%'
-          )
-      )
+    )
+    group by geographic_id, dataset_product_id, parent_product_id
 ),
 
 global_rollup as (
-    select
+    select distinct
         p.geographic_id as parent_geographic_id,
         c.geographic_id as child_geographic_id,
-        'VEEVA CRM' as parent_dataset_id,
-        'VEEVA CRM' as child_dataset_id,
+        'VEEVA_CRM' as parent_dataset_id,
+        'VEEVA_CRM' as child_dataset_id,
         p.dataset_product_id as parent_dataset_product_id,
         c.dataset_product_id as child_dataset_product_id,
         'GlobalRollup' as relationship_type_code,
@@ -285,11 +363,11 @@ global_rollup as (
 ),
 
 pmp_to_brand as (
-    select
+    select distinct
         p.geographic_id as parent_geographic_id,
         c.geographic_id as child_geographic_id,
-        'VEEVA CRM' as parent_dataset_id,
-        'VEEVA CRM' as child_dataset_id,
+        'VEEVA_CRM' as parent_dataset_id,
+        'VEEVA_CRM' as child_dataset_id,
         p.dataset_product_id as parent_dataset_product_id,
         c.dataset_product_id as child_dataset_product_id,
         'PMPtoBRAND' as relationship_type_code,
@@ -303,11 +381,11 @@ pmp_to_brand as (
 ),
 
 brand_to_ta as (
-    select
+    select distinct
         p.geographic_id as parent_geographic_id,
         c.geographic_id as child_geographic_id,
-        'VEEVA CRM' as parent_dataset_id,
-        'VEEVA CRM' as child_dataset_id,
+        'VEEVA_CRM' as parent_dataset_id,
+        'VEEVA_CRM' as child_dataset_id,
         p.dataset_product_id as parent_dataset_product_id,
         c.dataset_product_id as child_dataset_product_id,
         'BRANDtoTA' as relationship_type_code,
@@ -321,11 +399,11 @@ brand_to_ta as (
 ),
 
 brandind_to_brand as (
-    select
+    select distinct
         p.geographic_id as parent_geographic_id,
         c.geographic_id as child_geographic_id,
-        'VEEVA CRM' as parent_dataset_id,
-        'VEEVA CRM' as child_dataset_id,
+        'VEEVA_CRM' as parent_dataset_id,
+        'VEEVA_CRM' as child_dataset_id,
         p.dataset_product_id as parent_dataset_product_id,
         c.dataset_product_id as child_dataset_product_id,
         'BRANDINDtoBRAND' as relationship_type_code,
@@ -347,6 +425,7 @@ all_rel as (
     union all
     select * from brandind_to_brand
 ),
+
 final as (
     select
         parent_geographic_id,
@@ -389,5 +468,5 @@ final as (
         'VEEVA_CRM' as record_source
     from all_rel
 )
- 
+
 select * from final

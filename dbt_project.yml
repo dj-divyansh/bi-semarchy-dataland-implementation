@@ -14,6 +14,7 @@ on-run-start:
 
 on-run-end:
   - "{{ log_run_end(results) }}"
+  - "{{ send_load_alerts_v2(results) }}"
 
 flags:
   fail_fast: true
@@ -21,6 +22,14 @@ flags:
 vars:
   veeva_crm_source_database: DEV_DFHPMS2EU_DB
   veeva_crm_source_schema: LANDING_DFHPMS2EU_SCHEMA
+  enable_email_alerts: false
+  env_name: "DEV"
+  email_integration_name: "semarchy_email_intgration"
+  default_recipient: ""
+  default_cc_recipient: ""
+  audit_database: DEV_DFHPMS2EU_DB
+  audit_schema: DW_DFHPMS2EU_SEMARCHY_SCHEMA
+  alert_settings: {}
 
 models:
   veeva_crm:

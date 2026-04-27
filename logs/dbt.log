@@ -15465,3 +15465,371 @@ Finished 'parse' successfully for target 'dev' [1.3s]
 06:41:48.367019 [info ]: 
 ==================== Execution Summary =====================
 Finished 'parse' successfully for target 'dev' [1.2s]
+==================== 2026-04-23T03:30:18.559098Z | 019db863-7337-74f2-8b00-9ec25fa00344 ====================
+03:30:18.559229 [info ]: dbt-fusion 2.0.0-preview.126
+03:30:18.559419 [info ]: Started loading project
+03:30:18.566377 [info ]: Loading ~/.dbt/profiles.yml
+03:30:18.579242 [debug]:    Started loading packages
+03:30:18.600482 [debug]:     Loaded [  0.02s] packages
+03:30:18.601544 [info ]: Finished loading project [  0.04s]
+03:30:18.602878 [info ]: Started parsing
+03:30:18.643238 [debug]: Finished parsing models\source.yml [  0.00s]
+03:30:18.652262 [debug]: Finished parsing models\dm\DM_PRODUCT_FILE.sql [  0.00s]
+03:30:18.653580 [debug]: Finished parsing models\dm\DM_PRODUCT_IDENTIFIER.sql [  0.00s]
+03:30:18.654914 [debug]: Finished parsing models\dm\DM_PRODUCT_RELATIONSHIP.sql [  0.00s]
+03:30:18.656387 [debug]: Finished parsing models\dq\REJECT.SQL [  0.00s]
+03:30:18.658001 [debug]: Finished parsing models\hist\SAT_IDENTIFIER_HIST.sql [  0.00s]
+03:30:18.659620 [debug]: Finished parsing models\hist\SAT_PRODUCT_HIST.sql [  0.00s]
+03:30:18.661014 [debug]: Finished parsing models\hist\SAT_RELATIONSHIP_HIST.sql [  0.00s]
+03:30:18.662492 [debug]: Finished parsing models\hist\STG_PRODUCT_CLOSEUP_SNAPSHOT.sql [  0.00s]
+03:30:18.665140 [debug]: Finished parsing models\hist\STG_PRODUCT_GOB360_SNAPSHOT.sql [  0.00s]
+03:30:18.666518 [debug]: Finished parsing models\hist\STG_PRODUCT_VEEVA_SNAPSHOT.sql [  0.00s]
+03:30:18.667910 [debug]: Finished parsing models\hub\HUB.sql [  0.00s]
+03:30:18.669087 [debug]: Finished parsing models\sat\SAT_IDENTIFIER.sql [  0.00s]
+03:30:18.670255 [debug]: Finished parsing models\sat\SAT_PRODUCT_FILE.sql [  0.00s]
+03:30:18.671349 [debug]: Finished parsing models\sat\SAT_RELATIONSHIP.sql [  0.00s]
+03:30:18.672364 [debug]: Finished parsing models\stg\STG_IDENTIFIER_GOB360.sql [  0.00s]
+03:30:18.673544 [debug]: Finished parsing models\stg\STG_IDENTIFIER_VEEVA.sql [  0.00s]
+03:30:18.674756 [debug]: Finished parsing models\stg\STG_PRODUCT_CLOSEUP.sql [  0.00s]
+03:30:18.675721 [debug]: Finished parsing models\stg\STG_PRODUCT_CLOSEUP_MANUAL.sql [  0.00s]
+03:30:18.677027 [debug]: Finished parsing models\stg\STG_PRODUCT_GOB360.sql [  0.00s]
+03:30:18.678049 [debug]: Finished parsing models\stg\STG_PRODUCT_GOB360_HIST.sql [  0.00s]
+03:30:18.680821 [debug]: Finished parsing models\stg\STG_PRODUCT_VEEVA.sql [  0.00s]
+03:30:18.682321 [debug]: Finished parsing models\stg\STG_RELATIONSHIP_CLOSEUP.sql [  0.00s]
+03:30:18.683641 [debug]: Finished parsing models\stg\STG_RELATIONSHIP_GOB360.sql [  0.00s]
+03:30:18.685099 [debug]: Finished parsing models\stg\STG_RELATIONSHIP_VEEVA.sql [  0.00s]
+03:30:18.698049 [info ]: Finished parsing [  0.10s]
+03:30:19.452872 [info ]: New version available 2.0.0-preview.173 (run `dbt system update`)
+03:30:20.805597 [info ]: 
+==================== Execution Summary =====================
+Finished 'parse' successfully for target 'dev' [2.2s]
+==================== 2026-04-23T04:18:25.440070Z | 019db88f-8018-7310-86ef-3d928096f2c1 ====================
+04:18:25.440204 [info ]: dbt-fusion 2.0.0-preview.126
+04:18:25.440403 [info ]: Started loading project
+04:18:25.447685 [info ]: Loading ~/.dbt/profiles.yml
+04:18:25.461217 [debug]:    Started loading packages
+04:18:25.484226 [debug]:     Loaded [  0.02s] packages
+04:18:25.485171 [info ]: Finished loading project [  0.04s]
+04:18:25.486473 [info ]: Started parsing
+04:18:25.525343 [debug]: Finished parsing models\source.yml [  0.00s]
+04:18:25.532665 [debug]: Finished parsing models\dm\DM_PRODUCT_FILE.sql [  0.00s]
+04:18:25.534949 [debug]: Finished parsing models\dm\DM_PRODUCT_IDENTIFIER.sql [  0.00s]
+04:18:25.536499 [debug]: Finished parsing models\dm\DM_PRODUCT_RELATIONSHIP.sql [  0.00s]
+04:18:25.537982 [debug]: Finished parsing models\dq\REJECT.SQL [  0.00s]
+04:18:25.539177 [debug]: Finished parsing models\hist\SAT_IDENTIFIER_HIST.sql [  0.00s]
+04:18:25.540722 [debug]: Finished parsing models\hist\SAT_PRODUCT_HIST.sql [  0.00s]
+04:18:25.542416 [debug]: Finished parsing models\hist\SAT_RELATIONSHIP_HIST.sql [  0.00s]
+04:18:25.543763 [debug]: Finished parsing models\hist\STG_PRODUCT_CLOSEUP_SNAPSHOT.sql [  0.00s]
+04:18:25.544981 [debug]: Finished parsing models\hist\STG_PRODUCT_GOB360_SNAPSHOT.sql [  0.00s]
+04:18:25.546072 [debug]: Finished parsing models\hist\STG_PRODUCT_VEEVA_SNAPSHOT.sql [  0.00s]
+04:18:25.547218 [debug]: Finished parsing models\hub\HUB.sql [  0.00s]
+04:18:25.548461 [debug]: Finished parsing models\sat\SAT_IDENTIFIER.sql [  0.00s]
+04:18:25.549605 [debug]: Finished parsing models\sat\SAT_PRODUCT_FILE.sql [  0.00s]
+04:18:25.550765 [debug]: Finished parsing models\sat\SAT_RELATIONSHIP.sql [  0.00s]
+04:18:25.552071 [debug]: Finished parsing models\stg\STG_IDENTIFIER_GOB360.sql [  0.00s]
+04:18:25.553252 [debug]: Finished parsing models\stg\STG_IDENTIFIER_GOB360_HIST.sql [  0.00s]
+04:18:25.554379 [debug]: Finished parsing models\stg\STG_IDENTIFIER_VEEVA.sql [  0.00s]
+04:18:25.556451 [debug]: Finished parsing models\stg\STG_PRODUCT_CLOSEUP.sql [  0.00s]
+04:18:25.558009 [debug]: Finished parsing models\stg\STG_PRODUCT_CLOSEUP_MANUAL.sql [  0.00s]
+04:18:25.559344 [debug]: Finished parsing models\stg\STG_PRODUCT_GOB360.sql [  0.00s]
+04:18:25.560553 [debug]: Finished parsing models\stg\STG_PRODUCT_GOB360_HIST.sql [  0.00s]
+04:18:25.562005 [debug]: Finished parsing models\stg\STG_PRODUCT_VEEVA.sql [  0.00s]
+04:18:25.563542 [debug]: Finished parsing models\stg\STG_RELATIONSHIP_CLOSEUP.sql [  0.00s]
+04:18:25.564722 [debug]: Finished parsing models\stg\STG_RELATIONSHIP_GOB360.sql [  0.00s]
+04:18:25.565978 [debug]: Finished parsing models\stg\STG_RELATIONSHIP_GOB360_HIST.sql [  0.00s]
+04:18:25.567587 [debug]: Finished parsing models\stg\STG_RELATIONSHIP_VEEVA.sql [  0.00s]
+04:18:25.582041 [info ]: Finished parsing [  0.10s]
+04:18:26.936234 [info ]: New version available 2.0.0-preview.173 (run `dbt system update`)
+04:18:27.136821 [info ]: 
+==================== Execution Summary =====================
+Finished 'parse' successfully for target 'dev' [1.7s]
+==================== 2026-04-24T10:07:32.889250Z | 019dbef5-7e0d-7fd3-9d0d-14666abf5f12 ====================
+10:07:32.889492 [info ]: dbt-fusion 2.0.0-preview.126
+10:07:32.889795 [info ]: Started loading project
+10:07:32.900596 [info ]: Loading ~/.dbt/profiles.yml
+10:07:32.902285 [info ]: Finished loading project [  0.01s]
+10:07:32.902977 [error]: dbt1013: YAML error: could not find expected ':' at line 32 column 1, while scanning a simple key at line 30 column 1
+  --> ..\..\..\..\.dbt\profiles.yml:32:1
+10:07:35.477335 [info ]: 
+==================== Execution Summary =====================
+Finished 'compile' with 1 error [2.6s]
+==================== 2026-04-24T11:33:57.715785Z | 019dbf44-9b39-7540-9c41-309b6348c326 ====================
+11:33:57.719844 [info ]: dbt-fusion 2.0.0-preview.126
+11:33:57.725419 [info ]: Started loading project
+11:33:57.765601 [info ]: Loading ~/.dbt/profiles.yml
+11:33:57.770607 [info ]: Finished loading project [  0.05s]
+11:33:57.774619 [error]: dbt1013: YAML error: could not find expected ':' at line 32 column 1, while scanning a simple key at line 30 column 1
+  --> ..\..\..\..\.dbt\profiles.yml:32:1
+11:33:58.462919 [info ]: 
+==================== Execution Summary =====================
+Finished 'parse' with 1 error [747ms]
+==================== 2026-04-24T11:39:31.991128Z | 019dbf49-b511-7b71-ac99-d5410e8568f8 ====================
+11:39:31.991223 [info ]: dbt-fusion 2.0.0-preview.126
+11:39:31.991376 [info ]: Started loading project
+11:39:31.997330 [info ]: Loading profiles.yml
+11:39:32.009317 [debug]:    Started loading packages
+11:39:32.023578 [debug]:     Loaded [  0.01s] packages
+11:39:32.024500 [info ]: Finished loading project [  0.03s]
+11:39:32.026366 [info ]: Started parsing
+11:39:32.053349 [debug]: Finished parsing models\source.yml [  0.00s]
+11:39:32.058922 [debug]: Finished parsing models\dm\DM_PRODUCT_FILE.sql [  0.00s]
+11:39:32.059914 [debug]: Finished parsing models\dm\DM_PRODUCT_IDENTIFIER.sql [  0.00s]
+11:39:32.061113 [debug]: Finished parsing models\dm\DM_PRODUCT_RELATIONSHIP.sql [  0.00s]
+11:39:32.062188 [debug]: Finished parsing models\dq\REJECT.SQL [  0.00s]
+11:39:32.063057 [debug]: Finished parsing models\hist\SAT_IDENTIFIER_HIST.sql [  0.00s]
+11:39:32.064255 [debug]: Finished parsing models\hist\SAT_PRODUCT_HIST.sql [  0.00s]
+11:39:32.065426 [debug]: Finished parsing models\hist\SAT_RELATIONSHIP_HIST.sql [  0.00s]
+11:39:32.066387 [debug]: Finished parsing models\hist\STG_PRODUCT_CLOSEUP_SNAPSHOT.sql [  0.00s]
+11:39:32.067239 [debug]: Finished parsing models\hist\STG_PRODUCT_GOB360_SNAPSHOT.sql [  0.00s]
+11:39:32.068272 [debug]: Finished parsing models\hist\STG_PRODUCT_VEEVA_SNAPSHOT.sql [  0.00s]
+11:39:32.069216 [debug]: Finished parsing models\hub\HUB.sql [  0.00s]
+11:39:32.070029 [debug]: Finished parsing models\sat\SAT_IDENTIFIER.sql [  0.00s]
+11:39:32.070941 [debug]: Finished parsing models\sat\SAT_PRODUCT_FILE.sql [  0.00s]
+11:39:32.072261 [debug]: Finished parsing models\sat\SAT_RELATIONSHIP.sql [  0.00s]
+11:39:32.073309 [debug]: Finished parsing models\stg\STG_IDENTIFIER_GOB360.sql [  0.00s]
+11:39:32.074295 [debug]: Finished parsing models\stg\STG_IDENTIFIER_GOB360_HIST.sql [  0.00s]
+11:39:32.075376 [debug]: Finished parsing models\stg\STG_IDENTIFIER_VEEVA.sql [  0.00s]
+11:39:32.076393 [debug]: Finished parsing models\stg\STG_PRODUCT_CLOSEUP.sql [  0.00s]
+11:39:32.077301 [debug]: Finished parsing models\stg\STG_PRODUCT_GOB360.sql [  0.00s]
+11:39:32.078133 [debug]: Finished parsing models\stg\STG_PRODUCT_GOB360_HIST.sql [  0.00s]
+11:39:32.079300 [debug]: Finished parsing models\stg\STG_PRODUCT_VEEVA.sql [  0.00s]
+11:39:32.080286 [debug]: Finished parsing models\stg\STG_RELATIONSHIP_CLOSEUP.sql [  0.00s]
+11:39:32.081177 [debug]: Finished parsing models\stg\STG_RELATIONSHIP_GOB360.sql [  0.00s]
+11:39:32.082250 [debug]: Finished parsing models\stg\STG_RELATIONSHIP_GOB360_HIST.sql [  0.00s]
+11:39:32.083357 [debug]: Finished parsing models\stg\STG_RELATIONSHIP_VEEVA.sql [  0.00s]
+11:39:32.093044 [info ]: Finished parsing [  0.07s]
+11:39:32.869190 [info ]: New version available 2.0.0-preview.173 (run `dbt system update`)
+11:39:33.287820 [info ]: 
+==================== Execution Summary =====================
+Finished 'parse' successfully for target 'dev' [1.3s]
+==================== 2026-04-24T11:42:02.628783Z | 019dbf4c-017d-7a82-8137-c05897678a6c ====================
+11:42:02.628962 [info ]: dbt-fusion 2.0.0-preview.126
+11:42:02.629200 [info ]: Started loading project
+11:42:02.634497 [info ]: Loading profiles.yml
+11:42:02.661927 [debug]:    Started loading packages
+11:42:02.677065 [debug]:     Loaded [  0.02s] packages
+11:42:02.677741 [info ]: Finished loading project [  0.05s]
+11:42:02.678398 [info ]: Started parsing
+11:42:02.708657 [debug]: Finished parsing models\source.yml [  0.00s]
+11:42:02.714136 [debug]: Finished parsing models\dm\DM_PRODUCT_FILE.sql [  0.00s]
+11:42:02.715130 [debug]: Finished parsing models\dm\DM_PRODUCT_IDENTIFIER.sql [  0.00s]
+11:42:02.716136 [debug]: Finished parsing models\dm\DM_PRODUCT_RELATIONSHIP.sql [  0.00s]
+11:42:02.717456 [debug]: Finished parsing models\dq\REJECT.SQL [  0.00s]
+11:42:02.718436 [debug]: Finished parsing models\hist\SAT_IDENTIFIER_HIST.sql [  0.00s]
+11:42:02.719362 [debug]: Finished parsing models\hist\SAT_PRODUCT_HIST.sql [  0.00s]
+11:42:02.720330 [debug]: Finished parsing models\hist\SAT_RELATIONSHIP_HIST.sql [  0.00s]
+11:42:02.721292 [debug]: Finished parsing models\hist\STG_PRODUCT_CLOSEUP_SNAPSHOT.sql [  0.00s]
+11:42:02.722183 [debug]: Finished parsing models\hist\STG_PRODUCT_GOB360_SNAPSHOT.sql [  0.00s]
+11:42:02.723041 [debug]: Finished parsing models\hist\STG_PRODUCT_VEEVA_SNAPSHOT.sql [  0.00s]
+11:42:02.723989 [debug]: Finished parsing models\hub\HUB.sql [  0.00s]
+11:42:02.724839 [debug]: Finished parsing models\sat\SAT_IDENTIFIER.sql [  0.00s]
+11:42:02.725731 [debug]: Finished parsing models\sat\SAT_PRODUCT_FILE.sql [  0.00s]
+11:42:02.726905 [debug]: Finished parsing models\sat\SAT_RELATIONSHIP.sql [  0.00s]
+11:42:02.727750 [debug]: Finished parsing models\stg\STG_IDENTIFIER_GOB360.sql [  0.00s]
+11:42:02.728696 [debug]: Finished parsing models\stg\STG_IDENTIFIER_GOB360_HIST.sql [  0.00s]
+11:42:02.730023 [debug]: Finished parsing models\stg\STG_IDENTIFIER_VEEVA.sql [  0.00s]
+11:42:02.731399 [debug]: Finished parsing models\stg\STG_PRODUCT_CLOSEUP.sql [  0.00s]
+11:42:02.732318 [debug]: Finished parsing models\stg\STG_PRODUCT_GOB360.sql [  0.00s]
+11:42:02.733153 [debug]: Finished parsing models\stg\STG_PRODUCT_GOB360_HIST.sql [  0.00s]
+11:42:02.734590 [debug]: Finished parsing models\stg\STG_PRODUCT_VEEVA.sql [  0.00s]
+11:42:02.735616 [debug]: Finished parsing models\stg\STG_RELATIONSHIP_CLOSEUP.sql [  0.00s]
+11:42:02.736529 [debug]: Finished parsing models\stg\STG_RELATIONSHIP_GOB360.sql [  0.00s]
+11:42:02.737362 [debug]: Finished parsing models\stg\STG_RELATIONSHIP_GOB360_HIST.sql [  0.00s]
+11:42:02.738503 [debug]: Finished parsing models\stg\STG_RELATIONSHIP_VEEVA.sql [  0.00s]
+11:42:02.749590 [info ]: Finished parsing [  0.07s]
+11:42:03.528881 [info ]: New version available 2.0.0-preview.173 (run `dbt system update`)
+11:42:04.005608 [info ]: 
+==================== Execution Summary =====================
+Finished 'parse' successfully for target 'dev' [1.4s]
+==================== 2026-04-24T11:52:18.963897Z | 019dbf55-690d-7900-becb-bd638f3f51f7 ====================
+11:52:18.963984 [info ]: dbt-fusion 2.0.0-preview.126
+11:52:18.964130 [info ]: Started loading project
+11:52:18.970911 [info ]: Loading ~/.dbt/profiles.yml
+11:52:18.971752 [info ]: Finished loading project [  0.01s]
+11:52:18.972256 [error]: dbt1013: YAML error: could not find expected ':' at line 32 column 1, while scanning a simple key at line 30 column 1
+  --> ..\..\..\..\.dbt\profiles.yml:32:1
+11:52:19.594098 [info ]: 
+==================== Execution Summary =====================
+Finished 'parse' with 1 error [630ms]
+==================== 2026-04-24T11:56:01.420512Z | 019dbf58-ce04-7202-a8e9-f1d33f7d3219 ====================
+11:56:01.420627 [info ]: dbt-fusion 2.0.0-preview.126
+11:56:01.420811 [info ]: Started loading project
+11:56:01.427746 [info ]: Loading ~/.dbt/profiles.yml
+11:56:01.428197 [info ]: Finished loading project [  0.01s]
+11:56:01.429523 [error]: dbt1013: YAML error: could not find expected ':' at line 32 column 1, while scanning a simple key at line 30 column 1
+  --> ..\..\..\..\.dbt\profiles.yml:32:1
+11:56:02.445719 [info ]: 
+==================== Execution Summary =====================
+Finished 'parse' with 1 error [1.0s]
+==================== 2026-04-24T11:57:25.598216Z | 019dbf5a-16d7-7d42-a6c4-8bfb917230d2 ====================
+11:57:25.598314 [info ]: dbt-fusion 2.0.0-preview.126
+11:57:25.598470 [info ]: Started loading project
+11:57:25.603680 [info ]: Loading _local_profiles\profiles.yml
+11:57:25.630567 [debug]:    Started loading packages
+11:57:25.648240 [debug]:     Loaded [  0.02s] packages
+11:57:25.649159 [info ]: Finished loading project [  0.05s]
+11:57:25.651275 [info ]: Started parsing
+11:57:25.653998 [info ]: Finished parsing [  0.00s]
+11:57:25.654287 [error]: dbt1502: Failed to parse macro SQL syntax error: unexpected character
+(in macro\send_load_alerts.sql:127:54)
+  --> macro\send_load_alerts.sql:127:54
+11:57:26.516418 [info ]: New version available 2.0.0-preview.173 (run `dbt system update`)
+11:57:26.892390 [info ]: 
+==================== Execution Summary =====================
+Finished 'parse' with 1 error for target 'dev' [1.3s]
+==================== 2026-04-24T11:57:49.691830Z | 019dbf5a-74f4-75a3-8a70-0df97a06873f ====================
+11:57:49.691963 [info ]: dbt-fusion 2.0.0-preview.126
+11:57:49.692166 [info ]: Started loading project
+11:57:49.697257 [info ]: Loading _local_profiles\profiles.yml
+11:57:49.707584 [debug]:    Started loading packages
+11:57:49.723819 [debug]:     Loaded [  0.02s] packages
+11:57:49.724475 [info ]: Finished loading project [  0.03s]
+11:57:49.725117 [info ]: Started parsing
+11:57:49.755344 [debug]: Finished parsing models\source.yml [  0.00s]
+11:57:49.760981 [debug]: Finished parsing models\dm\DM_PRODUCT_FILE.sql [  0.00s]
+11:57:49.762563 [debug]: Finished parsing models\dm\DM_PRODUCT_IDENTIFIER.sql [  0.00s]
+11:57:49.763679 [debug]: Finished parsing models\dm\DM_PRODUCT_RELATIONSHIP.sql [  0.00s]
+11:57:49.767052 [debug]: Finished parsing models\dq\REJECT.SQL [  0.00s]
+11:57:49.769139 [debug]: Finished parsing models\hist\SAT_IDENTIFIER_HIST.sql [  0.00s]
+11:57:49.770373 [debug]: Finished parsing models\hist\SAT_PRODUCT_HIST.sql [  0.00s]
+11:57:49.772186 [debug]: Finished parsing models\hist\SAT_RELATIONSHIP_HIST.sql [  0.00s]
+11:57:49.773291 [debug]: Finished parsing models\hist\STG_PRODUCT_CLOSEUP_SNAPSHOT.sql [  0.00s]
+11:57:49.774384 [debug]: Finished parsing models\hist\STG_PRODUCT_GOB360_SNAPSHOT.sql [  0.00s]
+11:57:49.775711 [debug]: Finished parsing models\hist\STG_PRODUCT_VEEVA_SNAPSHOT.sql [  0.00s]
+11:57:49.778315 [debug]: Finished parsing models\hub\HUB.sql [  0.00s]
+11:57:49.780221 [debug]: Finished parsing models\sat\SAT_IDENTIFIER.sql [  0.00s]
+11:57:49.781491 [debug]: Finished parsing models\sat\SAT_PRODUCT_FILE.sql [  0.00s]
+11:57:49.783627 [debug]: Finished parsing models\sat\SAT_RELATIONSHIP.sql [  0.00s]
+11:57:49.785335 [debug]: Finished parsing models\stg\STG_IDENTIFIER_GOB360.sql [  0.00s]
+11:57:49.786377 [debug]: Finished parsing models\stg\STG_IDENTIFIER_GOB360_HIST.sql [  0.00s]
+11:57:49.787437 [debug]: Finished parsing models\stg\STG_IDENTIFIER_VEEVA.sql [  0.00s]
+11:57:49.788765 [debug]: Finished parsing models\stg\STG_PRODUCT_CLOSEUP.sql [  0.00s]
+11:57:49.789770 [debug]: Finished parsing models\stg\STG_PRODUCT_GOB360.sql [  0.00s]
+11:57:49.790875 [debug]: Finished parsing models\stg\STG_PRODUCT_GOB360_HIST.sql [  0.00s]
+11:57:49.792312 [debug]: Finished parsing models\stg\STG_PRODUCT_VEEVA.sql [  0.00s]
+11:57:49.794256 [debug]: Finished parsing models\stg\STG_RELATIONSHIP_CLOSEUP.sql [  0.00s]
+11:57:49.796264 [debug]: Finished parsing models\stg\STG_RELATIONSHIP_GOB360.sql [  0.00s]
+11:57:49.797325 [debug]: Finished parsing models\stg\STG_RELATIONSHIP_GOB360_HIST.sql [  0.00s]
+11:57:49.798606 [debug]: Finished parsing models\stg\STG_RELATIONSHIP_VEEVA.sql [  0.00s]
+11:57:49.809781 [info ]: Finished parsing [  0.08s]
+11:57:50.510648 [info ]: New version available 2.0.0-preview.173 (run `dbt system update`)
+11:57:50.942875 [info ]: 
+==================== Execution Summary =====================
+Finished 'parse' successfully for target 'dev' [1.3s]
+==================== 2026-04-24T12:00:46.233556Z | 019dbf5d-2693-7f53-a99e-3920ab43159a ====================
+12:00:46.233664 [info ]: dbt-fusion 2.0.0-preview.126
+12:00:46.233885 [info ]: Started loading project
+12:00:46.239315 [info ]: Loading _local_profiles\profiles.yml
+12:00:46.264823 [debug]:    Started loading packages
+12:00:46.297842 [debug]:     Loaded [  0.03s] packages
+12:00:46.298534 [info ]: Finished loading project [  0.06s]
+12:00:46.300374 [info ]: Started parsing
+12:00:46.345185 [debug]: Finished parsing models\source.yml [  0.00s]
+12:00:46.350380 [debug]: Finished parsing models\dm\DM_PRODUCT_FILE.sql [  0.00s]
+12:00:46.351538 [debug]: Finished parsing models\dm\DM_PRODUCT_IDENTIFIER.sql [  0.00s]
+12:00:46.352566 [debug]: Finished parsing models\dm\DM_PRODUCT_RELATIONSHIP.sql [  0.00s]
+12:00:46.353467 [debug]: Finished parsing models\dq\REJECT.SQL [  0.00s]
+12:00:46.354520 [debug]: Finished parsing models\hist\SAT_IDENTIFIER_HIST.sql [  0.00s]
+12:00:46.355334 [debug]: Finished parsing models\hist\SAT_PRODUCT_HIST.sql [  0.00s]
+12:00:46.356512 [debug]: Finished parsing models\hist\SAT_RELATIONSHIP_HIST.sql [  0.00s]
+12:00:46.357772 [debug]: Finished parsing models\hist\STG_PRODUCT_CLOSEUP_SNAPSHOT.sql [  0.00s]
+12:00:46.359113 [debug]: Finished parsing models\hist\STG_PRODUCT_GOB360_SNAPSHOT.sql [  0.00s]
+12:00:46.359926 [debug]: Finished parsing models\hist\STG_PRODUCT_VEEVA_SNAPSHOT.sql [  0.00s]
+12:00:46.360879 [debug]: Finished parsing models\hub\HUB.sql [  0.00s]
+12:00:46.361793 [debug]: Finished parsing models\sat\SAT_IDENTIFIER.sql [  0.00s]
+12:00:46.362733 [debug]: Finished parsing models\sat\SAT_PRODUCT_FILE.sql [  0.00s]
+12:00:46.363618 [debug]: Finished parsing models\sat\SAT_RELATIONSHIP.sql [  0.00s]
+12:00:46.364346 [debug]: Finished parsing models\stg\STG_IDENTIFIER_GOB360.sql [  0.00s]
+12:00:46.365116 [debug]: Finished parsing models\stg\STG_IDENTIFIER_GOB360_HIST.sql [  0.00s]
+12:00:46.366115 [debug]: Finished parsing models\stg\STG_IDENTIFIER_VEEVA.sql [  0.00s]
+12:00:46.367507 [debug]: Finished parsing models\stg\STG_PRODUCT_CLOSEUP.sql [  0.00s]
+12:00:46.368488 [debug]: Finished parsing models\stg\STG_PRODUCT_GOB360.sql [  0.00s]
+12:00:46.369642 [debug]: Finished parsing models\stg\STG_PRODUCT_GOB360_HIST.sql [  0.00s]
+12:00:46.370685 [debug]: Finished parsing models\stg\STG_PRODUCT_VEEVA.sql [  0.00s]
+12:00:46.371496 [debug]: Finished parsing models\stg\STG_RELATIONSHIP_CLOSEUP.sql [  0.00s]
+12:00:46.372191 [debug]: Finished parsing models\stg\STG_RELATIONSHIP_GOB360.sql [  0.00s]
+12:00:46.372914 [debug]: Finished parsing models\stg\STG_RELATIONSHIP_GOB360_HIST.sql [  0.00s]
+12:00:46.373832 [debug]: Finished parsing models\stg\STG_RELATIONSHIP_VEEVA.sql [  0.00s]
+12:00:46.383833 [info ]: Finished parsing [  0.08s]
+12:00:47.163300 [info ]: New version available 2.0.0-preview.173 (run `dbt system update`)
+12:00:47.428941 [info ]: 
+==================== Execution Summary =====================
+Finished 'parse' successfully for target 'dev' [1.2s]
+==================== 2026-04-24T12:03:15.905517Z | 019dbf5f-6f39-7003-b2b0-4f908fb5ca3b ====================
+12:03:15.906458 [info ]: dbt-fusion 2.0.0-preview.126
+12:03:15.907852 [info ]: Started loading project
+12:03:15.926726 [info ]: Loading _local_profiles\profiles.yml
+12:03:15.954095 [debug]:    Started loading packages
+12:03:15.988886 [debug]:     Loaded [  0.03s] packages
+12:03:15.989613 [info ]: Finished loading project [  0.08s]
+12:03:15.991393 [info ]: Started parsing
+12:03:16.036206 [debug]: Finished parsing models\source.yml [  0.00s]
+12:03:16.042470 [debug]: Finished parsing models\dm\DM_PRODUCT_FILE.sql [  0.00s]
+12:03:16.043500 [debug]: Finished parsing models\dm\DM_PRODUCT_IDENTIFIER.sql [  0.00s]
+12:03:16.044913 [debug]: Finished parsing models\dm\DM_PRODUCT_RELATIONSHIP.sql [  0.00s]
+12:03:16.052914 [debug]: Finished parsing models\dq\REJECT.SQL [  0.01s]
+12:03:16.062539 [debug]: Finished parsing models\hist\SAT_IDENTIFIER_HIST.sql [  0.01s]
+12:03:16.064507 [debug]: Finished parsing models\hist\SAT_PRODUCT_HIST.sql [  0.00s]
+12:03:16.066157 [debug]: Finished parsing models\hist\SAT_RELATIONSHIP_HIST.sql [  0.00s]
+12:03:16.067570 [debug]: Finished parsing models\hist\STG_PRODUCT_CLOSEUP_SNAPSHOT.sql [  0.00s]
+12:03:16.068572 [debug]: Finished parsing models\hist\STG_PRODUCT_GOB360_SNAPSHOT.sql [  0.00s]
+12:03:16.069771 [debug]: Finished parsing models\hist\STG_PRODUCT_VEEVA_SNAPSHOT.sql [  0.00s]
+12:03:16.071208 [debug]: Finished parsing models\hub\HUB.sql [  0.00s]
+12:03:16.072710 [debug]: Finished parsing models\sat\SAT_IDENTIFIER.sql [  0.00s]
+12:03:16.073812 [debug]: Finished parsing models\sat\SAT_PRODUCT_FILE.sql [  0.00s]
+12:03:16.075002 [debug]: Finished parsing models\sat\SAT_RELATIONSHIP.sql [  0.00s]
+12:03:16.076123 [debug]: Finished parsing models\stg\STG_IDENTIFIER_GOB360.sql [  0.00s]
+12:03:16.077216 [debug]: Finished parsing models\stg\STG_IDENTIFIER_GOB360_HIST.sql [  0.00s]
+12:03:16.078280 [debug]: Finished parsing models\stg\STG_IDENTIFIER_VEEVA.sql [  0.00s]
+12:03:16.087558 [debug]: Finished parsing models\stg\STG_PRODUCT_CLOSEUP.sql [  0.01s]
+12:03:16.095782 [debug]: Finished parsing models\stg\STG_PRODUCT_GOB360.sql [  0.01s]
+12:03:16.096669 [debug]: Finished parsing models\stg\STG_PRODUCT_GOB360_HIST.sql [  0.00s]
+12:03:16.097719 [debug]: Finished parsing models\stg\STG_PRODUCT_VEEVA.sql [  0.00s]
+12:03:16.098943 [debug]: Finished parsing models\stg\STG_RELATIONSHIP_CLOSEUP.sql [  0.00s]
+12:03:16.099860 [debug]: Finished parsing models\stg\STG_RELATIONSHIP_GOB360.sql [  0.00s]
+12:03:16.100721 [debug]: Finished parsing models\stg\STG_RELATIONSHIP_GOB360_HIST.sql [  0.00s]
+12:03:16.102128 [debug]: Finished parsing models\stg\STG_RELATIONSHIP_VEEVA.sql [  0.00s]
+12:03:16.128570 [info ]: Finished parsing [  0.14s]
+12:03:16.891244 [info ]: New version available 2.0.0-preview.173 (run `dbt system update`)
+12:03:17.225168 [info ]: 
+==================== Execution Summary =====================
+Finished 'parse' successfully for target 'dev' [1.3s]
+==================== 2026-04-24T12:06:40.611329Z | 019dbf62-8ed5-7852-bce6-861d61e0d582 ====================
+12:06:40.611553 [info ]: dbt-fusion 2.0.0-preview.126
+12:06:40.611924 [info ]: Started loading project
+12:06:40.624845 [info ]: Loading _local_profiles\profiles.yml
+12:06:40.646068 [debug]:    Started loading packages
+12:06:40.677508 [debug]:     Loaded [  0.03s] packages
+12:06:40.678716 [info ]: Finished loading project [  0.07s]
+12:06:40.681945 [info ]: Started parsing
+12:06:40.737874 [debug]: Finished parsing models\source.yml [  0.00s]
+12:06:40.752156 [debug]: Finished parsing models\dm\DM_PRODUCT_FILE.sql [  0.01s]
+12:06:40.754058 [debug]: Finished parsing models\dm\DM_PRODUCT_IDENTIFIER.sql [  0.00s]
+12:06:40.756472 [debug]: Finished parsing models\dm\DM_PRODUCT_RELATIONSHIP.sql [  0.00s]
+12:06:40.759313 [debug]: Finished parsing models\dq\REJECT.SQL [  0.00s]
+12:06:40.761376 [debug]: Finished parsing models\hist\SAT_IDENTIFIER_HIST.sql [  0.00s]
+12:06:40.763572 [debug]: Finished parsing models\hist\SAT_PRODUCT_HIST.sql [  0.00s]
+12:06:40.765699 [debug]: Finished parsing models\hist\SAT_RELATIONSHIP_HIST.sql [  0.00s]
+12:06:40.768265 [debug]: Finished parsing models\hist\STG_PRODUCT_CLOSEUP_SNAPSHOT.sql [  0.00s]
+12:06:40.770067 [debug]: Finished parsing models\hist\STG_PRODUCT_GOB360_SNAPSHOT.sql [  0.00s]
+12:06:40.771676 [debug]: Finished parsing models\hist\STG_PRODUCT_VEEVA_SNAPSHOT.sql [  0.00s]
+12:06:40.773235 [debug]: Finished parsing models\hub\HUB.sql [  0.00s]
+12:06:40.774902 [debug]: Finished parsing models\sat\SAT_IDENTIFIER.sql [  0.00s]
+12:06:40.776392 [debug]: Finished parsing models\sat\SAT_PRODUCT_FILE.sql [  0.00s]
+12:06:40.777734 [debug]: Finished parsing models\sat\SAT_RELATIONSHIP.sql [  0.00s]
+12:06:40.778999 [debug]: Finished parsing models\stg\STG_IDENTIFIER_GOB360.sql [  0.00s]
+12:06:40.780274 [debug]: Finished parsing models\stg\STG_IDENTIFIER_GOB360_HIST.sql [  0.00s]
+12:06:40.782159 [debug]: Finished parsing models\stg\STG_IDENTIFIER_VEEVA.sql [  0.00s]
+12:06:40.783914 [debug]: Finished parsing models\stg\STG_PRODUCT_CLOSEUP.sql [  0.00s]
+12:06:40.785298 [debug]: Finished parsing models\stg\STG_PRODUCT_GOB360.sql [  0.00s]
+12:06:40.786798 [debug]: Finished parsing models\stg\STG_PRODUCT_GOB360_HIST.sql [  0.00s]
+12:06:40.788435 [debug]: Finished parsing models\stg\STG_PRODUCT_VEEVA.sql [  0.00s]
+12:06:40.789719 [debug]: Finished parsing models\stg\STG_RELATIONSHIP_CLOSEUP.sql [  0.00s]
+12:06:40.791157 [debug]: Finished parsing models\stg\STG_RELATIONSHIP_GOB360.sql [  0.00s]
+12:06:40.793390 [debug]: Finished parsing models\stg\STG_RELATIONSHIP_GOB360_HIST.sql [  0.00s]
+12:06:40.795243 [debug]: Finished parsing models\stg\STG_RELATIONSHIP_VEEVA.sql [  0.00s]
+12:06:40.813121 [info ]: Finished parsing [  0.13s]
+12:06:41.682902 [info ]: New version available 2.0.0-preview.173 (run `dbt system update`)
+12:06:42.021104 [info ]: 
+==================== Execution Summary =====================
+Finished 'parse' successfully for target 'dev' [1.4s]
