@@ -1,61 +1,47 @@
 {{ config(materialized='view') }}
 
-with src as (
+with hist as (
     select
-        trim(clave) as clave,
-        trim(nombre) as nombre,
-        trim(forma_farma) as forma_farma,
-        trim(concentracion) as concentracion,
-        trim(presentacion) as presentacion
-    from {{ source('gob360_pm', 'GOB360_MX_BOEHRINGER_CAT_CLAVES') }}
-    where clave is not null and trim(clave) != ''
-      and nombre is not null and trim(nombre) not in ('', '-')
-      and forma_farma is not null and trim(forma_farma) not in ('', '-')
-      and concentracion is not null and trim(concentracion) not in ('', '-')
-),
-
-pmp_products as (
-    select
-        'MX' as geographic_id,
-        'GOB360_PM' as dataset_id,
-        'GOB360_PM' as source_dataset_id,
-        upper(trim(clave)) as dataset_product_id,
-        'PMP' as product_type_code,
-        upper(trim(concat_ws(' ', nombre, forma_farma, concentracion, nullif(presentacion, '-')))) as product_name,
-        null as standardized_product_name,
-        upper(trim(concat_ws(' ', nombre, forma_farma, concentracion, nullif(presentacion, '-')))) as description,
-        'A' as product_status_code,
-        null as effective_date,
-        null as end_date,
-        null as brand_name,
-        null as generic_names,
-        null as approved_date,
-        null as marketing_start_date,
-        null as marketing_end_date,
-        null as expiration_date,
-        upper(trim(nombre)) as substance,
-        null as dose_form_code,
-        null as strength,
-        null as route_of_administration_code,
-        null as pharmaceutical_product_quantity,
-        null as unit_of_presentation_code,
-        null as primary_package_quantity,
-        null as primary_package_type_code,
-        null as secondary_package_quantity,
-        null as secondary_package_type_code,
-        null as package_quantity,
-        null as shelf_life_quantity,
-        null as shelf_life_unit_of_measure_code,
-        null as sample_indicator,
-        null as competitor_indicator,
-        null as generic_indicator,
-        null as prescription_required_indicator,
-        null as atc_code,
+        trim(geographic_id) as geographic_id,
+        trim(dataset_id) as dataset_id,
+        trim(source_dataset_id) as source_dataset_id,
+        trim(dataset_product_id) as dataset_product_id,
+        trim(product_type_code) as product_type_code,
+        trim(product_name) as product_name,
+        trim(standardized_product_name) as standardized_product_name,
+        trim(description) as description,
+        trim(product_status_code) as product_status_code,
+        try_to_date(trim(effective_date)) as effective_date,
+        try_to_date(trim(end_date)) as end_date,
+        trim(brand_name) as brand_name,
+        trim(generic_names) as generic_names,
+        try_to_date(trim(approved_date)) as approved_date,
+        try_to_date(trim(marketing_start_date)) as marketing_start_date,
+        try_to_date(trim(marketing_end_date)) as marketing_end_date,
+        try_to_date(trim(expiration_date)) as expiration_date,
+        trim(substance) as substance,
+        trim(dose_form_code) as dose_form_code,
+        trim(strength) as strength,
+        trim(route_of_administration_code) as route_of_administration_code,
+        trim(pharmaceutical_product_quantity) as pharmaceutical_product_quantity,
+        trim(unit_of_presentation_code) as unit_of_presentation_code,
+        trim(primary_package_quantity) as primary_package_quantity,
+        trim(primary_package_type_code) as primary_package_type_code,
+        trim(secondary_package_quantity) as secondary_package_quantity,
+        trim(secondary_package_type_code) as secondary_package_type_code,
+        trim(package_quantity) as package_quantity,
+        trim(shelf_life_quantity) as shelf_life_quantity,
+        trim(shelf_life_unit_of_measure_code) as shelf_life_unit_of_measure_code,
+        trim(sample_indicator) as sample_indicator,
+        cast(competitor_indicator as varchar) as competitor_indicator,
+        trim(generic_indicator) as generic_indicator,
+        trim(prescription_required_indicator) as prescription_required_indicator,
+        trim(atc_code) as atc_code,
         null as who_code,
         null as nfc_code,
         null as chc_nec_code,
         null as usc_code,
-        null as manufacturer_id,
+        trim(manufacturer_id) as manufacturer_id,
         null as manufacturer,
         null as corporation,
         null as daily_dosage_quantity,
@@ -64,12 +50,14 @@ pmp_products as (
         null as channel,
         null as chc_flag,
         current_timestamp() as source_lastmodifieddate
-    from src
+    from {{ target.database }}.DW_DFHPMS2EU_SEMARCHY_SCHEMA.ATV_PRODUCT_HIST
+    where dataset_product_id is not null and trim(dataset_product_id) != ''
+      and product_name is not null and trim(product_name) not in ('', '-')
 ),
 
-with_md5 as (
+final as (
     select
-        pmp_products.*,
+        hist.*,
         md5(
             concat_ws(
                 '||',
@@ -91,10 +79,10 @@ with_md5 as (
                 coalesce(standardized_product_name, ''),
                 coalesce(description, ''),
                 coalesce(product_status_code, ''),
-                coalesce(generic_names, ''),
                 coalesce(cast(effective_date as varchar), ''),
                 coalesce(cast(end_date as varchar), ''),
                 coalesce(brand_name, ''),
+                coalesce(generic_names, ''),
                 coalesce(cast(approved_date as varchar), ''),
                 coalesce(cast(marketing_start_date as varchar), ''),
                 coalesce(cast(marketing_end_date as varchar), ''),
@@ -121,7 +109,8 @@ with_md5 as (
                 coalesce(nfc_code, ''),
                 coalesce(chc_nec_code, ''),
                 coalesce(usc_code, ''),
-                coalesce(manufacturer_id, ''),
+                coalesce(manufacturer_id, '')
+                ,
                 coalesce(daily_dosage_quantity, ''),
                 coalesce(corporation, ''),
                 coalesce(manufacturer, ''),
@@ -131,12 +120,10 @@ with_md5 as (
                 coalesce(chc_flag, '')
             )
         ) as hashdiff,
-        to_timestamp_ltz('{{ run_started_at.strftime("%Y-%m-%d %H:%M:%S") }}') as load_datetime
-    from pmp_products
+        current_timestamp() as load_datetime,
+        '{{ env_var("ETL_BATCH_ID", env_var("DBT_JOB_RUN_ID", invocation_id)) }}' as etl_batch_id,
+        'ATV' as record_source
+    from hist
 )
 
-select
-    d.*,
-    '{{ env_var("ETL_BATCH_ID", env_var("DBT_JOB_RUN_ID", invocation_id)) }}' as etl_batch_id,
-    'GOB360_PM' as record_source
-from with_md5 d
+select * from final

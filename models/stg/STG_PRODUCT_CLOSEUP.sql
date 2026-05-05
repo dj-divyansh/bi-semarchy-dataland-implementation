@@ -7,8 +7,21 @@ with brand_src as (
         'CLOSEUP_MARKET' as source_dataset_id,
         concat('BRAND_', trim(m.codigo)) as dataset_product_id,
         'BRAND' as product_type_code,
-        trim(substr(m.nome, 1, greatest(length(m.nome) - 3, 0))) as product_name,
-        trim(substr(m.nome, 1, greatest(length(m.nome) - 3, 0))) as brand_name,
+        upper(
+            replace(
+                trim(regexp_replace(substr(m.nome, 1, greatest(length(m.nome) - 3, 0)), '[[:space:]]+', ' ')),
+                '''',
+                ''
+            )
+        ) as product_name,
+        upper(
+            replace(
+                trim(regexp_replace(substr(m.nome, 1, greatest(length(m.nome) - 3, 0)), '[[:space:]]+', ' ')),
+                '''',
+                ''
+            )
+        ) as brand_name,
+        null as atc_code_src,
         case
             when upper(trim(c.nome)) like '%BOEHRINGER ING%' then 'N'
             else 'Y'
@@ -17,7 +30,7 @@ with brand_src as (
         null as prescription_required_indicator,
         null as substance,
         concat(trim(lab.cdg), trim(m.siglalab)) as manufacturer_id,
-        c.nome as corporation,
+        null as corporation,
         greatest(
             coalesce(cast(m.last_updt_dt as timestamp_ltz), '1900-01-01'::timestamp_ltz),
             coalesce(cast(c.last_updt_dt as timestamp_ltz), '1900-01-01'::timestamp_ltz),
@@ -39,7 +52,10 @@ mp_substance as (
     select
         upper(trim(mp.country)) as geographic_id,
         trim(mp.cdgprod) as dataset_product_id,
-        array_to_string(array_sort(array_agg(distinct trim(mol.nome))), '|') as substance
+        array_to_string(
+            array_sort(array_agg(distinct trim(regexp_replace(mol.nome, '[[:space:]]+', ' ')))),
+            '|'
+        ) as substance
     from {{ source('closeup_market', 'MOLECULA_PRODUCTO') }} mp
     inner join {{ source('closeup_market', 'MOLECULA') }} mol
         on mp.cdgmol = mol.codigomole
@@ -55,6 +71,27 @@ mp_substance as (
         trim(mp.cdgprod)
 ),
 
+mp_prep as (
+    select
+        p.*,
+        case
+            when p.nome is null or trim(p.nome) = '' then null
+            when regexp_count(trim(p.nome), ' ') = 0 then null
+            else regexp_substr(trim(p.nome), '[^[:space:]]+$')
+        end as atc_from_name,
+        case
+            when p.nome is null or trim(p.nome) = '' then null
+            when regexp_count(trim(p.nome), ' ') = 0 then trim(p.nome)
+            else trim(
+                left(
+                    trim(p.nome),
+                    length(trim(p.nome)) - length(regexp_substr(trim(p.nome), '[^[:space:]]+$')) - 1
+                )
+            )
+        end as name_stripped
+    from {{ source('closeup_market', 'PRODUCTO') }} p
+),
+
 mp_src as (
     select
         upper(trim(p.country)) as geographic_id,
@@ -62,8 +99,21 @@ mp_src as (
         'CLOSEUP_MARKET' as source_dataset_id,
         trim(p.codigo) as dataset_product_id,
         'MP' as product_type_code,
-        trim(regexp_replace(p.nome, '\s+\S+$', '')) as product_name,
-        trim(substr(m.nome, 1, greatest(length(m.nome) - 3, 0))) as brand_name,
+        upper(
+            replace(
+                trim(regexp_replace(p.name_stripped, '[[:space:]]+', ' ')),
+                '''',
+                ''
+            )
+        ) as product_name,
+        upper(
+            replace(
+                trim(regexp_replace(substr(m.nome, 1, greatest(length(m.nome) - 3, 0)), '[[:space:]]+', ' ')),
+                '''',
+                ''
+            )
+        ) as brand_name,
+        nullif(trim(p.codigoclasse), '') as atc_code_src,
         case
             when p.flg_classific = 'G' then 'Y'
         end as generic_indicator,
@@ -77,14 +127,14 @@ mp_src as (
         end as competitor_indicator,
         s.substance as substance,
         concat(trim(lab.cdg), trim(p.codigolab)) as manufacturer_id,
-        corp.nome as corporation,
+        null as corporation,
         greatest(
             coalesce(cast(p.last_updt_dt as timestamp_ltz), '1900-01-01'::timestamp_ltz),
             coalesce(cast(m.last_updt_dt as timestamp_ltz), '1900-01-01'::timestamp_ltz),
             coalesce(cast(lab.last_updt_dt as timestamp_ltz), '1900-01-01'::timestamp_ltz),
             coalesce(cast(corp.last_updt_dt as timestamp_ltz), '1900-01-01'::timestamp_ltz)
         ) as source_lastmodifieddate
-    from {{ source('closeup_market', 'PRODUCTO') }} p
+    from mp_prep p
     left join mp_substance s
         on s.dataset_product_id = trim(p.codigo)
        and s.geographic_id = upper(trim(p.country))
@@ -112,6 +162,7 @@ all_prod as (
         product_type_code,
         product_name,
         brand_name,
+        atc_code_src,
         competitor_indicator,
         generic_indicator,
         prescription_required_indicator,
@@ -131,6 +182,7 @@ all_prod as (
         product_type_code,
         product_name,
         brand_name,
+        atc_code_src,
         competitor_indicator,
         generic_indicator,
         prescription_required_indicator,
@@ -177,7 +229,7 @@ transformed as (
         competitor_indicator,
         generic_indicator,
         prescription_required_indicator,
-        null as atc_code,
+        atc_code_src as atc_code,
         null as who_code,
         null as nfc_code,
         null as chc_nec_code,

@@ -24,7 +24,7 @@ sources:
 
           - name: description_vod__c
 
-          - name: external_id_vod__c
+          - name: external_id_vodQ__c
 
           - name: product_type_vod__c
 
@@ -185,6 +185,8 @@ sources:
           - name: FLG_ETICO
 
           - name: CODIGOLAB
+
+          - name : CODIGOCLASSE
 
           - name: CURR_FLG
 

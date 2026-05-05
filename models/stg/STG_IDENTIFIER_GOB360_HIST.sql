@@ -1,19 +1,30 @@
 {{ config(materialized='view') }}
 
-with hist as (
+with src as (
     select
-        trim(geographic_id) as geographic_id,
-        trim(dataset_id) as dataset_id,
-        trim(dataset_product_id) as dataset_product_id,
-        trim(identifier_type_code) as identifier_type_code,
-        trim(identifier_id) as identifier_id,
-        trim(status_code) as status_code,
-        effective_date,
-        end_date,
+        trim(clave) as clave,
+        nombre,
+        forma_farma,
+        concentracion
+    from {{ source('gob360_pm', 'GOB360_MX_BOEHRINGER_CAT_CLAVES') }}
+    where clave is not null and trim(clave) != ''
+      and nombre is not null and trim(nombre) not in ('', '-')
+      and forma_farma is not null and trim(forma_farma) not in ('', '-')
+      and concentracion is not null and trim(concentracion) not in ('', '-')
+),
+
+transformed as (
+    select
+        'MX' as geographic_id,
+        'GOB360_PM' as dataset_id,
+        upper(trim(clave)) as dataset_product_id,
+        'GOB360_PM' as identifier_type_code,
+        concat('MX_', upper(trim(clave))) as identifier_id,
+        null as status_code,
+        null as effective_date,
+        null as end_date,
         current_timestamp() as source_lastmodifieddate
-    from {{ target.database }}.DW_DFHPMS2EU_SEMARCHY_SCHEMA.LATAM_GOB360_HIST_IDENTIFIER
-    where dataset_product_id is not null and trim(dataset_product_id) != ''
-      and identifier_id is not null and trim(identifier_id) not in ('', '-')
+    from src
 ),
 
 final as (
@@ -52,7 +63,7 @@ final as (
         current_timestamp() as load_datetime,
         '{{ env_var("ETL_BATCH_ID", env_var("DBT_JOB_RUN_ID", invocation_id)) }}' as etl_batch_id,
         'GOB360_PM' as record_source
-    from hist
+    from transformed
 )
 
 select * from final

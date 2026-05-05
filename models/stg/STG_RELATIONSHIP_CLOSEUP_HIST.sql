@@ -1,28 +1,21 @@
 {{ config(materialized='view') }}
 
-with src as (
+with hist as (
     select
-        trim(clave) as clave,
-        trim(nombre) as nombre
-    from {{ source('gob360_pm', 'GOB360_MX_BOEHRINGER_CAT_CLAVES') }}
-    where clave is not null and trim(clave) != ''
-      and nombre is not null and trim(nombre) != ''
-),
-
-transformed as (
-    select
-        'MX' as parent_geographic_id,
-        'MX' as child_geographic_id,
-        'GOB360_PM' as parent_dataset_id,
-        'GOB360_PM' as child_dataset_id,
-        null as parent_dataset_product_id,
-        upper(trim(clave)) as child_dataset_product_id,
-        'PMPtoBRAND' as relationship_type_code,
-        null as status_code,
-        null as effective_date,
-        null as end_date,
+        upper(trim(parent_geographic_id)) as parent_geographic_id,
+        upper(trim(child_geographic_id)) as child_geographic_id,
+        trim(parent_dataset_id) as parent_dataset_id,
+        trim(child_dataset_id) as child_dataset_id,
+        upper(trim(parent_dataset_product_id)) as parent_dataset_product_id,
+        trim(cast(child_dataset_product_id as varchar)) as child_dataset_product_id,
+        trim(relationship_type_code) as relationship_type_code,
+        trim(status_code) as status_code,
+        try_to_date(trim(effective_date)) as effective_date,
+        try_to_date(trim(end_date)) as end_date,
         current_timestamp() as source_lastmodifieddate
-    from src
+    from {{ var('closeup_hist_database', target.database) }}.{{ var('closeup_hist_schema', 'DW_DFHPMS2EU_SEMARCHY_SCHEMA') }}.{{ var('closeup_relationship_hist_table', 'CLOSEUP_RELATIONSHIP_HIST') }}
+    where parent_dataset_product_id is not null and trim(parent_dataset_product_id) != ''
+      and child_dataset_product_id is not null and trim(child_dataset_product_id) != ''
 ),
 
 final as (
@@ -64,8 +57,8 @@ final as (
         ) as hashdiff,
         current_timestamp() as load_datetime,
         '{{ env_var("ETL_BATCH_ID", env_var("DBT_JOB_RUN_ID", invocation_id)) }}' as etl_batch_id,
-        'GOB360_PM' as record_source
-    from transformed
+        'CLOSEUP_MARKET' as record_source
+    from hist
 )
 
 select * from final

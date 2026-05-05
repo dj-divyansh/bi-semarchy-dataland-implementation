@@ -127,24 +127,8 @@
     {{ return('') }}
 {% endmacro %}
 
-{% macro audit_source_system(node=None) %}
-    {% set env_ss = (env_var('SOURCE_SYSTEM', '') | trim) %}
-    {% if env_ss != '' %}
-        {{ return(env_ss | upper) }}
-    {% endif %}
-
-    {% if node is not none %}
-        {% set n = ((node.name or '') | trim | upper) %}
-        {% if 'GOB360' in n %}
-            {{ return('GOB360_PM') }}
-        {% elif 'CLOSEUP' in n %}
-            {{ return('CLOSEUP_MARKET') }}
-        {% elif 'VEEVA' in n %}
-            {{ return('VEEVA_CRM') }}
-        {% endif %}
-    {% endif %}
-
-    {{ return('VEEVA_CRM') }}
+{% macro audit_source_system() %}
+    {{ return((env_var('SOURCE_SYSTEM', 'VEEVA_CRM') | trim | upper)) }}
 {% endmacro %}
 
 {% macro audit_std_layer_name(raw_layer_name) %}
@@ -241,7 +225,7 @@
     {% set layer_name = model.fqn[1] if model.fqn|length > 1 else (model.tags[0] if model.tags else "UNKNOWN") %}
     {% set layer_name = audit_std_layer_name(layer_name) %}
     {% set model_name = audit_std_model_name(model.name) %}
-    {% set source_system = audit_source_system(model) %}
+    {% set source_system = audit_source_system() %}
     
     {% set insert_query %}
         INSERT INTO {{ target.database }}.DW_DFHPMS2EU_SEMARCHY_SCHEMA.AUDIT_PROCESS_LOG (
@@ -297,12 +281,12 @@
 {% macro log_run_end(results) %}
     {% set etl_batch_id = env_var('ETL_BATCH_ID', env_var('DBT_JOB_RUN_ID', invocation_id)) %}
     {% set ns = namespace(total_rejected_records=0) %}
+    {% set source_system = audit_source_system() %}
 
     {% do ensure_audit_tables() %}
 
     {% for r in results %}
         {% if r.node is not none and r.node.resource_type == 'model' %}
-            {% set source_system = audit_source_system(r.node) %}
             {% set resp = r.adapter_response or {} %}
             {% set delta_inserted = resp.get('rows_inserted') or 0 %}
             {% set delta_updated = resp.get('rows_updated') or 0 %}
